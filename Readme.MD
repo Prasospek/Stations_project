@@ -1,9 +1,9 @@
-<b>Projekt LS2023/2024</b>
+<b><h1>Projekt LS2023/2024</h1></b>
 <br></br>
 Implementujte systém pro podzemní dopravu na Marsu.
 
 <ul>
-Požadavky> obsahuje více stanic na povrchu a v podzemí planety.</li>
+<li>Systém obsahuje více stanic na povrchu a v podzemí planety.</li>
 <li>Cestující si mohou zakoupit jízdenky na stanici přes pracovníka nebo sami online.</li>
 <li>Každá stanice má své označení a spojení s ostatními stanicemi.</li>
 <li>Cestující si mohou vybrat svůj cíl a systém jim nabídne nejkratší trasu.</li>
@@ -12,9 +12,9 @@ Požadavky> obsahuje více stanic na povrchu a v podzemí planety.</li>
 <li>Systém umožňuje cestujícím sledovat polohu vlaku na mapě (bonus)</li>
 <li>Technici mohou sledovat stav tratí a zadávat problémy a poruchy.</li>
 <li>Administrátor systému může spravovat uživatelské účty a zobrazovat statistiky o provozu a využívání metra na Marsu.</li>
-<ul>
+</ul>
 
-<b>Požadavky></b>
+<b><h2>Požadavky</h2></b>
 
 <ul>
 <li>Každý vypracovává projekt sám, nepracuje se v týmech.</li>
