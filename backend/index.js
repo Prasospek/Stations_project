@@ -1,3 +1,4 @@
+/* IMPORTS */
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
@@ -7,6 +8,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
 
+/* SETUP */
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -15,6 +17,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(cors());
 
+/* MONGO CONNECTION */
 const PORT = process.env.PORT || 7001;
 
 mongoose
