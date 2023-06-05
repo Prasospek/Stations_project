@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
 
-/* ENUM ROLE TYPE ""!!! */ 
-
 const UserSchema = new mongoose.Schema(
     {
         firstName: {
@@ -26,6 +24,11 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: true,
             min: 5,
+        },
+        role: {
+            type: String,
+            enum: ["admin", "technician", "user"],
+            default: "user",
         },
     },
     { timestamps: true }
