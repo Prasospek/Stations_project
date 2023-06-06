@@ -10,6 +10,16 @@ export const register = async (req, res) => {
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
 
+        /* EMAIL REGEX CHECK */
+        if (!email.match(emailRegex)) {
+            return res.status(400).json({ error: "Invalid email format" });
+        }
+
+        /* PASSWORD REGEX CHECK */
+        if (!password.match(passwordRegex)) {
+            return res.status(400).json({ error: "Invalid password format" });
+        }
+
         const newUser = new User({
             firstName,
             lastName,
@@ -20,9 +30,7 @@ export const register = async (req, res) => {
         });
 
         const savedUser = await newUser.save();
-        res.status(201).json(
-            `$ New user successfully created ! \n {savedUser}`
-        );
+        res.status(201).json(`New user successfully created ! \n ${savedUser}`);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -41,5 +49,9 @@ export const login = async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid credentials ! " });
         }
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        delete user.password;
+        res.status(200).json(`Successfully logged in ! \n ${token} ${user}`);
     } catch (err) {}
 };
