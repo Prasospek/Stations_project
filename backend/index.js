@@ -8,6 +8,9 @@ import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
 
+/* ROUTES IMPORT */
+import authRoutes from "./routes/auth.js";
+
 /* MODELS*/
 import User from "./models/User.js";
 
@@ -19,6 +22,9 @@ app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(cors());
+
+/* ROUTES */
+app.use("/auth", authRoutes);
 
 /* MONGO CONNECTION */
 const PORT = process.env.PORT || 7001;
