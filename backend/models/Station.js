@@ -12,5 +12,8 @@ const StationSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// TODO
+/* PREVIOUS STOP NEXT STOP ? */ 
+
 const Station = mongoose.model("Station", StationSchema);
 export default Station;
