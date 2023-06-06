@@ -30,6 +30,10 @@ const UserSchema = new mongoose.Schema(
             enum: ["admin", "technician", "user"],
             default: "user",
         },
+        tickets: {
+            type: Array,
+            default: [],
+        },
     },
     { timestamps: true }
 );
