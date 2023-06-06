@@ -38,5 +38,7 @@ const UserSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Cestující si mohou zakoupit jízdenky na stanici přes pracovníka nebo sami online.
+
 const User = mongoose.model("User", UserSchema);
 export default User;
