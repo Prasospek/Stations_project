@@ -13,7 +13,9 @@ const StationSchema = new mongoose.Schema(
 );
 
 // TODO
-/* PREVIOUS STOP NEXT STOP ? */ 
+// Systém obsahuje více stanic na povrchu a v podzemí planety.
+
+/* PREVIOUS STOP NEXT STOP ? */
 
 const Station = mongoose.model("Station", StationSchema);
 export default Station;
