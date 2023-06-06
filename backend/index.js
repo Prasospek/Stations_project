@@ -8,6 +8,9 @@ import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
 
+/* MODELS*/
+import User from "./models/User.js";
+
 /* SETUP */
 dotenv.config();
 const app = express();
