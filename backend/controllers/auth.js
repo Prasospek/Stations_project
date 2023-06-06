@@ -10,6 +10,10 @@ export const register = async (req, res) => {
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
 
+        // Validate email and password using regex
+        const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
+        const passwordRegex = /^[a-zA-Z0-9]+$/;
+
         /* EMAIL REGEX CHECK */
         if (!email.match(emailRegex)) {
             return res.status(400).json({ error: "Invalid email format" });
@@ -40,6 +44,22 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        // Validate email and password using regex
+        const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
+        const passwordRegex = /^[a-zA-Z0-9]+$/;
+
+        /* EMAIL REGEX CHECK */
+        if (!email.match(emailRegex)) {
+            return res.status(400).json({ error: "Invalid email format" });
+        }
+
+        /* PASSWORD REGEX CHECK */
+        if (!password.match(passwordRegex)) {
+            return res.status(400).json({ error: "Invalid password format" });
+        }
+
+
         const user = await User.findOne({ email: email });
         if (!user) {
             return res.status(400).json({ message: "User does not exist ! " });
