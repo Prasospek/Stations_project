@@ -19,3 +19,17 @@ export const verifyToken = async (req, res, next) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+export const authRole = (requiredRoles) => {
+    return (req, res, next) => {
+        const { role } = req.user;
+
+        if (requiredRoles.includes(role)) {
+            next();
+        } else {
+            res.status(403).json({
+                error: "Access denied. Insufficient role.",
+            });
+        }
+    };
+};
