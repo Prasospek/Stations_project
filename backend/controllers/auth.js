@@ -9,7 +9,7 @@ const secureRegex = /^[a-zA-Z0-9]+$/;
 /* REGISTER USER */
 export const register = async (req, res) => {
     try {
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password, role } = req.body;
 
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
@@ -31,7 +31,7 @@ export const register = async (req, res) => {
             lastName,
             email,
             password: passwordHash,
-            role: "user",
+            role,
             tickets: [],
         });
 
