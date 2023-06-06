@@ -17,15 +17,15 @@ Implementujte systém pro podzemní dopravu na Marsu.
 <b><h2>Požadavky</h2></b>
 
 <ul>
-<li>Každý vypracovává projekt sám, nepracuje se v týmech.</li>
-<li>Splnění funkčnosti podle požadavků.</li>
-<li>Použití frameworků na frontendu i backendu.</li>
+<li>Každý vypracovává projekt sám, nepracuje se v týmech. ✅</li>
+<li>Splnění funkčnosti podle požadavků. ✅</li>
+<li>Použití frameworků na frontendu i backendu. ✅</li>
 <li>Zabezpečení na frontendu i backendu (role uživatelů, SQL injection, ošetření vstupních dat)</li>
 <li>Databáze (schéma tabulek dává smysl, správné pojmenování atributů, vazby mezi tabulkami, správné datové typy).</li>
-<li>Uživatelská přívětivost (je jasné na první pohled, jak se aplikace ovládá, doporučuji vyzkoušet před obhajobou na kamarádovi).</li>
-<li>Verzování v gitu (nebudou akceptovány projekty, kde většina práce je udělaná v posledních dnech před obhajobou, nebo práce, kde je veškerá práce v několika málo commitech). Je povinnost používat repozitáře vytvořené vyučujícím na Bitbucketu.</li>
-<li>Aplikace musí být přenositelná (spustitelná na jiném počítači z gitu, doporučuji vyzkoušet).</li>
-<li>Osobní obhajoba projektu ve zkouškovém před nebo po zkoušce.</li>
+<li>Uživatelská přívětivost (je jasné na první pohled, jak se aplikace ovládá, doporučuji vyzkoušet před obhajobou na kamarádovi). ✅ </li>
+<li>Verzování v gitu (nebudou akceptovány projekty, kde většina práce je udělaná v posledních dnech před obhajobou, nebo práce, kde je veškerá práce v několika málo commitech). Je povinnost používat repozitáře vytvořené vyučujícím na Bitbucketu. ✅ </li>
+<li>Aplikace musí být přenositelná (spustitelná na jiném počítači z gitu, doporučuji vyzkoušet). ✅</li>
+<li>Osobní obhajoba projektu ve zkouškovém před nebo po zkoušce. ✅</li>
 </ul>
 
 <img src="https://ctrlv.cz/shots/2023/06/05/hZZv.png" alt="Image Description">
