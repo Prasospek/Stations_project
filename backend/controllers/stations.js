@@ -5,6 +5,10 @@ export const getStation = async (req, res) => {
         const { id } = req.params;
         const station = await Station.findById(id);
 
+        if (!station) {
+            return res.status(404).json({ error: "Station not found !" });
+        }
+
         res.status(200).json(station);
     } catch (err) {
         res.status(500).json({ error: err.message });
