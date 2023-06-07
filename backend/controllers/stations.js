@@ -1,5 +1,8 @@
+import Station from "../models/Station.js";
+
 export const getStation = async (req, res) => {
     try {
+        const { id } = req.params;
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
