@@ -1,4 +1,11 @@
 import express from "express";
+import {
+    getInfoBoard,
+    getInfoBoards,
+    createInfoBoard,
+    updateInfoBoard,
+    deleteInfoBoard,
+} from "../controllers/infoBoards.js";
 
 const router = express.Router();
 
