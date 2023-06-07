@@ -12,6 +12,7 @@ import path from "path";
 import authRoutes from "./routes/auth.js";
 import stationRoutes from "./routes/stations.js";
 import ticketRoutes from "./routes/tickets.js";
+import trainLinesRoutes from "./routes/trainlines.js";
 
 /* MODELS*/
 import User from "./models/User.js";
@@ -29,6 +30,7 @@ app.use(cors());
 app.use("/auth", authRoutes);
 app.use("/stations", stationRoutes);
 app.use("/tickets", ticketRoutes);
+app.use("/trainlines", trainLinesRoutes);
 
 /* MONGO CONNECTION */
 const PORT = process.env.PORT || 7001;
