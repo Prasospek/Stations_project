@@ -23,8 +23,17 @@ export const getStations = async (req, res) => {
 
 export const createStation = async (req, res) => {
     try {
+        const { name, surface, connections, info_board_id } = req.body;
+        const newStation = new Station({
+            name,
+            surface,
+            connections,
+            info_board_id,
+        });
 
-        
+        await newStation.save();
+
+        res.status(201).json(newStation);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -32,6 +41,7 @@ export const createStation = async (req, res) => {
 
 export const updateStation = async (req, res) => {
     try {
+        const { id } = req.params;
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
