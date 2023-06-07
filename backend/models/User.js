@@ -7,12 +7,14 @@ const UserSchema = new mongoose.Schema(
             required: true,
             min: 2,
             max: 50,
+            match: /^[a-zA-Z0-9]+$/,
         },
         lastName: {
             type: String,
             required: true,
             min: 2,
             max: 50,
+            match: /^[a-zA-Z0-9]+$/,
         },
         email: {
             type: String,
@@ -33,11 +35,13 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: true,
             min: 5,
+            match: /^[a-zA-Z0-9]+$/,
         },
         role: {
             type: String,
             enum: ["admin", "technician", "user"],
             default: "user",
+            match: /^[a-zA-Z]+$/,
         },
         tickets: {
             type: Array,
