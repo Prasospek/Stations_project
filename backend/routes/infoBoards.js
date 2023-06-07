@@ -3,17 +3,17 @@ import express from "express";
 const router = express.Router();
 
 /*GET */
-router.get("/");            //Ziskani vsech info tabuli
-router.get("/:id");            // Ziskani specifické info tabule
+router.get("/", getInfoBoards); //Ziskani vsech info tabuli
+router.get("/:id", getInfoBoard); // Ziskani specifické info tabule
 
 /* POST */
-router.post("/");            // Vytvoreni nove info tabule
+router.post("/", createInfoBoard); // Vytvoreni nove info tabule
 
 /* PUT */
-router.put("/:id");            // Aktualizace info tabule
+router.put("/:id", updateInfoBoard); // Aktualizace info tabule
 
-/* DELETE */ 
-router.delete("/:id");            // Smazani info Tabule
+/* DELETE */
+router.delete("/:id", deleteInfoBoard); // Smazani info tabule
 
 export default router;
 
