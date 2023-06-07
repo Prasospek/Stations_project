@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-// Definice schématu
 const issueSchema = new mongoose.Schema(
     {
         station_id: {
@@ -13,9 +12,15 @@ const issueSchema = new mongoose.Schema(
             required: true,
         },
         reported_by: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Technician",
+            type: String,
             required: true,
+            validate: {
+                validator: function (value) {
+                    const allowedRoles = ["admin", "technician"];
+                    return allowedRoles.includes(value.role);
+                },
+                message: "Invalid role for reported_by",
+            },
         },
         reported_date: {
             type: Date,
@@ -25,8 +30,6 @@ const issueSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Vytvoření modelu
 const Issue = mongoose.model("Issue", issueSchema);
 
-// Export modelu
 export default Issue;
