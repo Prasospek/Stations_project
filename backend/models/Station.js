@@ -1,23 +1,26 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const StationSchema = new mongoose.Schema(
-    {
-        stationName: {
-            type: String,
-            required: true,
-            min: 2,
-            max: 50,
-        },
+// Definice schématu
+const stationSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
     },
-    { timestamps: true }
-);
+    surface: { type: Boolean, required: true },
+    connections: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Station",
+        },
+    ],
+    info_board_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "InfoBoard",
+    },
+});
 
-// TODO
-// Systém obsahuje více stanic na povrchu a v podzemí planety.
+// Vytvoření modelu
+const Station = mongoose.model("Station", stationSchema);
 
-// Každá stanice má své označení a spojení s ostatními stanicemi.
-
-/* PREVIOUS STOP NEXT STOP ? */
-
-const Station = mongoose.model("Station", StationSchema);
+// Export modelu
 export default Station;
