@@ -15,6 +15,7 @@ const trainLineSchema = new mongoose.Schema(
         ],
         status: {
             type: String,
+            enum: ["operational", "disruption", "maintenance"],
             required: true,
         },
     },
