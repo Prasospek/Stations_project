@@ -1,14 +1,19 @@
 import mongoose from "mongoose";
 
-const infoBoardSchema = new mongoose.Schema({
-    _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
-    station_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Station",
-        required: true,
+const infoBoardSchema = new mongoose.Schema(
+    {
+        station_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Station",
+            required: true,
+        },
+        content: {
+            type: String,
+            required: true,
+        },
     },
-    content: { type: String, required: true },
-});
+    { timestamps: true }
+);
 
 const InfoBoard = mongoose.model("InfoBoard", infoBoardSchema);
 
