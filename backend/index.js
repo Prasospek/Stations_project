@@ -16,8 +16,6 @@ import trainLinesRoutes from "./routes/trainLines.js";
 import issueRoutes from "./routes/issues.js";
 import infoBoardsRoutes from "./routes/infoBoards.js";
 
-/* MODELS*/
-import User from "./models/User.js";
 
 /* SETUP */
 dotenv.config();
