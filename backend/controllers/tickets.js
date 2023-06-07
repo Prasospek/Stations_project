@@ -66,7 +66,6 @@ export const updateTicket = async (req, res) => {
             return res.status(404).json({ error: "Ticket not found !" });
         }
 
-        await updatedTicket.save();
         res.status(200).json(updatedTicket);
     } catch (err) {
         res.status(500).json({ error: err.message });

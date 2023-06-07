@@ -59,7 +59,6 @@ export const updateIssue = async (req, res) => {
             return res.status(404).json({ error: "Issue not found !" });
         }
 
-        await updatedIssue.save();
 
         res.status(200).json(updatedIssue);
     } catch (err) {

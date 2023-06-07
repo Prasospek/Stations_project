@@ -63,8 +63,7 @@ export const updateStation = async (req, res) => {
             return res.status(404).json({ error: "Station not found !" });
         }
 
-        await updatedStation.save();
-        
+
         res.status(200).json(updatedStation);
     } catch (err) {
         res.status(500).json({ error: err.message });
