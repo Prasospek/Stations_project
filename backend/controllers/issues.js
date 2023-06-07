@@ -18,9 +18,9 @@ export const getIssue = async (req, res) => {
 
 export const getIssues = async (req, res) => {
     try {
-        const issue = await Issue.find();
+        const issues = await Issue.find();
 
-        res.status(200).json(issue);
+        res.status(200).json(issues);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -59,7 +59,7 @@ export const updateIssue = async (req, res) => {
             return res.status(404).json({ error: "Issue not found !" });
         }
 
-        await updatedIssue.save();
+
         res.status(200).json(updatedIssue);
     } catch (err) {
         res.status(500).json({ error: err.message });
