@@ -48,17 +48,23 @@ export const updateStation = async (req, res) => {
         const { id } = req.params;
         const { name, surface, connections, info_board_id } = req.body;
 
-        const updatedStation = await Station.findByIdAndUpdate(id, {
-            name,
-            surface,
-            connections,
-            info_board_id,
-        });
+        const updatedStation = await Station.findByIdAndUpdate(
+            id,
+            {
+                name,
+                surface,
+                connections,
+                info_board_id,
+            },
+            { new: true }
+        );
 
         if (!updatedStation) {
             return res.status(404).json({ error: "Station not found !" });
         }
 
+        await updatedStation.save();
+        
         res.status(200).json(updatedStation);
     } catch (err) {
         res.status(500).json({ error: err.message });

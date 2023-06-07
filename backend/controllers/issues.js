@@ -53,12 +53,13 @@ export const updateIssue = async (req, res) => {
             station_id,
             description,
             reported_by,
-        });
+        }, { new: true });
 
         if (!updatedIssue) {
             return res.status(404).json({ error: "Issue not found !" });
         }
 
+        await updatedIssue.save();
 
         res.status(200).json(updatedIssue);
     } catch (err) {

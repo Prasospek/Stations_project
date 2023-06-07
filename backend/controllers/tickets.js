@@ -51,18 +51,22 @@ export const updateTicket = async (req, res) => {
         const { passenger_id, station_id, purchase_method, destination_id } =
             req.body;
 
-        const updatedTicket = await Ticket.findByIdAndUpdate(id, {
-            passenger_id,
-            station_id,
-            purchase_method,
-            destination_id,
-        });
+        const updatedTicket = await Ticket.findByIdAndUpdate(
+            id,
+            {
+                passenger_id,
+                station_id,
+                purchase_method,
+                destination_id,
+            },
+            { new: true }
+        );
 
         if (!updatedTicket) {
             return res.status(404).json({ error: "Ticket not found !" });
         }
 
-
+        await updatedTicket.save();
         res.status(200).json(updatedTicket);
     } catch (err) {
         res.status(500).json({ error: err.message });
