@@ -2,7 +2,7 @@ import express from "express";
 import {
     getStation,
     getStations,
-    newStation,
+    createStation,
     updateStation,
     deleteStation,
 } from "../controllers/stations.js";
@@ -14,7 +14,7 @@ router.get("/", getStations); // ziskani seznamu vsech stanic
 router.get("/:id", getStation); // ziskani detailu konkretni stanice
 
 /* POST */
-router.post("/", newStation); // vytvoreni nove stanice
+router.post("/", createStation); // vytvoreni nove stanice
 
 /* PUT */
 router.put("/:id", updateStation); // aktualizace detailu silnice

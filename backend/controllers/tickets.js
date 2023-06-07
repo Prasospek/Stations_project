@@ -1,32 +1,32 @@
-export const getStation = async (req, res) => {
+export const getTicket = async (req, res) => {
     try {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
-export const getStations = async (req, res) => {
+export const getTickets = async (req, res) => {
     try {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
-export const createStation = async (req, res) => {
+export const createTicket = async (req, res) => {
     try {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
-export const updateStation = async (req, res) => {
+export const updateTicket = async (req, res) => {
     try {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
-export const deleteStation = async (req, res) => {
+export const deleteTicket = async (req, res) => {
     try {
     } catch (err) {
         res.status(500).json({ error: err.message });

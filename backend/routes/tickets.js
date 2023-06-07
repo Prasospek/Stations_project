@@ -1,19 +1,27 @@
 import express from "express";
 
+import {
+    getTicket,
+    getTickets,
+    createTicket,
+    updateTicket,
+    deleteTicket,
+} from "../controllers/tickets.js";
+
 const router = express.Router();
 
 /*GET */
-router.get("/"); // Ziskani vsech jizdenek
-router.get(":id"); // Ziskani specifické jizdenky
+router.get("/", getTickets); // Ziskani vsech jizdenek
+router.get("/:id", getTicket); // Ziskani specifické jizdenky
 
 /* POST */
-router.post("/"); // Vytvoreni nove jizdenky
+router.post("/", createTicket); // Vytvoreni nove jizdenky
 
 /* PUT */
-router.put("/:id"); // Upraveni detailu jizdenky
+router.put("/:id", updateTicket); // Upraveni detailu jizdenky
 
 /* DELETE */
-router.delete(":id"); // zrušení jizdenky
+router.delete("/:id", deleteTicket); // zrušení jizdenky
 
 export default router;
 

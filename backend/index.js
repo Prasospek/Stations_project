@@ -11,6 +11,7 @@ import path from "path";
 /* ROUTES IMPORT */
 import authRoutes from "./routes/auth.js";
 import stationRoutes from "./routes/stations.js";
+import ticketRoutes from "./routes/tickets.js";
 
 /* MODELS*/
 import User from "./models/User.js";
@@ -27,6 +28,7 @@ app.use(cors());
 /* ROUTES */
 app.use("/auth", authRoutes);
 app.use("/stations", stationRoutes);
+app.use("/tickets", ticketRoutes);
 
 /* MONGO CONNECTION */
 const PORT = process.env.PORT || 7001;
