@@ -1,4 +1,11 @@
 import express from "express";
+import {
+    getIssue,
+    getIssues,
+    createIssue,
+    updateIssue,
+    deleteIssue,
+} from "../controllers/issues.js";
 
 const router = express.Router();
 

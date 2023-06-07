@@ -13,6 +13,7 @@ import authRoutes from "./routes/auth.js";
 import stationRoutes from "./routes/stations.js";
 import ticketRoutes from "./routes/tickets.js";
 import trainLinesRoutes from "./routes/trainlines.js";
+import issueRoutes from "./routes/issues.js";
 
 /* MODELS*/
 import User from "./models/User.js";
@@ -31,6 +32,7 @@ app.use("/auth", authRoutes);
 app.use("/stations", stationRoutes);
 app.use("/tickets", ticketRoutes);
 app.use("/trainlines", trainLinesRoutes);
+app.use("/issues", issueRoutes);
 
 /* MONGO CONNECTION */
 const PORT = process.env.PORT || 7001;
