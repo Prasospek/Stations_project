@@ -1,5 +1,11 @@
 import express from "express";
-import { login, register } from "../controllers/auth.js";
+import {
+    getStation,
+    getStations,
+    newStation,
+    updateStation,
+    deleteStation,
+} from "../controllers/stations.js";
 
 const router = express.Router();
 
@@ -14,7 +20,7 @@ router.post("/", newStation); // vytvoreni nove stanice
 router.put("/:id", updateStation); // aktualizace detailu silnice
 
 /* DELETE */
-router.delete("/:id"); // odstraneni stanice
+router.delete("/:id", deleteStation); // odstraneni stanice
 
 export default router;
 
