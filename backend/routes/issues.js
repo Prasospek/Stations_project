@@ -12,6 +12,7 @@ const router = express.Router();
 /*GET */
 router.get("/", getIssues); // Ziskani vsech poruch
 router.get("/:id", getIssue); // Ziskani specificke poruchy
+
 /* POST */
 router.post("/", createIssue); // Vytvoreni nove poruchy
 
