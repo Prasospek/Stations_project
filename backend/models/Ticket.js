@@ -15,6 +15,7 @@ const ticketSchema = new mongoose.Schema(
         },
         purchase_method: {
             type: String,
+            enum: ["online", "station"],
             required: true,
         },
         destination_id: {
