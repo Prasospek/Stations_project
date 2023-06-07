@@ -1,32 +1,28 @@
 import mongoose from "mongoose";
 
 // Definice schématu
-const stationSchema = new mongoose.Schema(
+const trainLineSchema = new mongoose.Schema(
     {
         name: {
             type: String,
             required: true,
         },
-        surface: {
-            type: Boolean,
-            required: true,
-        },
-        connections: [
+        stations: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Station",
             },
         ],
-        info_board_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "InfoBoard",
+        status: {
+            type: String,
+            required: true,
         },
     },
     { timestamps: true }
 );
 
 // Vytvoření modelu
-const Station = mongoose.model("Station", stationSchema);
+const TrainLine = mongoose.model("TrainLine", trainLineSchema);
 
 // Export modelu
-export default Station;
+export default TrainLine;
