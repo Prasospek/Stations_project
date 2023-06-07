@@ -54,6 +54,10 @@ export const updateInfoBoard = async (req, res) => {
             { new: true }
         );
 
+        if (!updatedInfoBoard) {
+            return res.status(404).json({ error: "InfoBoard not found !" });
+        }
+
         res.status(204).json(updatedInfoBoard);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -65,6 +69,10 @@ export const deleteInfoBoard = async (req, res) => {
         const { id } = req.params;
 
         const deletedInfoBoard = await InfoBoard.findByIdAndDelete(id);
+
+        if (!deletedInfoBoard) {
+            return res.status(404).json({ error: "InfoBoard not found !" });
+        }
 
         res.status(204).json(deletedInfoBoard);
     } catch (err) {
