@@ -42,6 +42,11 @@ const Navbar = () => {
 
     const fullName = `test`;
 
+
+    const handleTickets = () =>{
+        navigate("")
+    }
+
     return (
         <FlexBetween padding="1rem 6%" backgroundColor={alt}>
             <FlexBetween gap="1.75rem">
@@ -57,7 +62,7 @@ const Navbar = () => {
                         },
                     }}
                 >
-                    Sociopedia
+                    Project
                 </Typography>
             </FlexBetween>
 
@@ -72,12 +77,12 @@ const Navbar = () => {
                         )}
                     </IconButton>
                     <Button
-                        variant="contained"
+                        variant="standart"
                         sx={{
                             backgroundColor: neutralLight,
                             width: "150px",
                             borderRadius: "0.25rem",
-                            p: "0.5rem 1rem",
+                            p: "0.55rem 1rem",
                             "& .MuiSvgIcon-root": {
                                 pr: "0.25rem",
                                 width: "3rem",
@@ -112,6 +117,9 @@ const Navbar = () => {
                             </MenuItem>
                             <MenuItem onClick={() => dispatch(setLogout())}>
                                 Log Out
+                            </MenuItem>
+                            <MenuItem onClick={() => dispatch(setLogout())}>
+                                My tickets!
                             </MenuItem>
                         </Select>
                     </FormControl>
