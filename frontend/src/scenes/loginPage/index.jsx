@@ -16,7 +16,7 @@ const LoginPage = () => {
                 textAlign={"center"}
             >
                 <Typography fontWeight="bold" fontSize="32px" color="primary">
-                    Wa-Project
+                    Mars Tracks
                 </Typography>
             </Box>
             <Box
@@ -31,7 +31,8 @@ const LoginPage = () => {
                     variant={"h5"}
                     sx={{ mb: "1.5rem" }}
                 >
-                    Welcome to Sociopedia, the Social Media for Sociopaths
+                    Welcome to Mars Tracks! Best place to buy tickets to get around
+                    Mars!
                 </Typography>
                 <Form />
             </Box>

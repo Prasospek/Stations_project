@@ -61,7 +61,7 @@ const Navbar = () => {
                         },
                     }}
                 >
-                    Wa-Project
+                    Mars Tracks
                 </Typography>
             </FlexBetween>
 
