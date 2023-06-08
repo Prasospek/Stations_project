@@ -9,6 +9,7 @@ import {
     FormControl,
     useTheme,
     useMediaQuery,
+    Button,
 } from "@mui/material";
 import {
     Search,
@@ -39,7 +40,7 @@ const Navbar = () => {
     const primaryLight = theme.palette.primary.light;
     const alt = theme.palette.background.alt;
 
-    const fullName = `${user.firstName} ${user.lastName}`;
+    const fullName = `test`;
 
     return (
         <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -58,19 +59,6 @@ const Navbar = () => {
                 >
                     Sociopedia
                 </Typography>
-                {isNonMobileScreens && (
-                    <FlexBetween
-                        backgroundColor={neutralLight}
-                        borderRadius="9px"
-                        gap="3rem"
-                        padding="0.1rem 1.5rem"
-                    >
-                        <InputBase placeholder="Search..." />
-                        <IconButton>
-                            <Search />
-                        </IconButton>
-                    </FlexBetween>
-                )}
             </FlexBetween>
 
             {/* DESKTOP NAV */}
@@ -83,9 +71,24 @@ const Navbar = () => {
                             <LightMode sx={{ color: dark, fontSize: "25px" }} />
                         )}
                     </IconButton>
-                    <Message sx={{ fontSize: "25px" }} />
-                    <Notifications sx={{ fontSize: "25px" }} />
-                    <Help sx={{ fontSize: "25px" }} />
+                    <Button
+                        variant="contained"
+                        sx={{
+                            backgroundColor: neutralLight,
+                            width: "150px",
+                            borderRadius: "0.25rem",
+                            p: "0.5rem 1rem",
+                            "& .MuiSvgIcon-root": {
+                                pr: "0.25rem",
+                                width: "3rem",
+                            },
+                            "& .MuiButton-root:focus": {
+                                backgroundColor: neutralLight,
+                            },
+                        }}
+                    >
+                        My Button
+                    </Button>
                     <FormControl variant="standard" value={fullName}>
                         <Select
                             value={fullName}
