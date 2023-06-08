@@ -13,7 +13,7 @@ export const authSlice = createSlice({
             state.user = aciton.payload.user;
             state.token = aciton.payload.token;
         },
-        setLogout: (state, action) => {
+        setLogout: (state) => {
             state.user = null;
             state.token = null;
         },
