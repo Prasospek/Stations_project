@@ -14,8 +14,8 @@ function App() {
 
     const isAuth = Boolean(
         useSelector((state) => {
-            //  console.log("state.token value:", state.token); // Add this line to log the value of state.token
-            // console.log("isAuth value:", isAuth);
+            //console.log("state.token value:", state.token); // Add this line to log the value of state.token
+            //console.log("isAuth value:", isAuth);
             return state.token;
         })
     );
