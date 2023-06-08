@@ -61,7 +61,7 @@ const Navbar = () => {
                         },
                     }}
                 >
-                    Project
+                    Wa-Project
                 </Typography>
             </FlexBetween>
 
