@@ -42,10 +42,9 @@ const Navbar = () => {
 
     const fullName = `test`;
 
-
-    const handleTickets = () =>{
-        navigate("")
-    }
+    const handleTickets = () => {
+        navigate("");
+    };
 
     return (
         <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -92,7 +91,7 @@ const Navbar = () => {
                             },
                         }}
                     >
-                        My Button
+                        My Tickets
                     </Button>
                     <FormControl variant="standard" value={fullName}>
                         <Select
@@ -117,9 +116,6 @@ const Navbar = () => {
                             </MenuItem>
                             <MenuItem onClick={() => dispatch(setLogout())}>
                                 Log Out
-                            </MenuItem>
-                            <MenuItem onClick={() => dispatch(setLogout())}>
-                                My tickets!
                             </MenuItem>
                         </Select>
                     </FormControl>
@@ -161,7 +157,7 @@ const Navbar = () => {
                         flexDirection="column"
                         justifyContent="center"
                         alignItems="center"
-                        gap="3rem"
+                        gap="2rem"
                     >
                         <IconButton
                             onClick={() => dispatch(setMode())}
@@ -175,9 +171,26 @@ const Navbar = () => {
                                 />
                             )}
                         </IconButton>
-                        <Message sx={{ fontSize: "25px" }} />
-                        <Notifications sx={{ fontSize: "25px" }} />
-                        <Help sx={{ fontSize: "25px" }} />
+
+                        <Button
+                            variant="standart"
+                            sx={{
+                                backgroundColor: neutralLight,
+                                width: "150px",
+                                borderRadius: "0.25rem",
+                                p: "0.55rem 1rem",
+                                "& .MuiSvgIcon-root": {
+                                    pr: "0.25rem",
+                                    width: "3rem",
+                                },
+                                "& .MuiButton-root:focus": {
+                                    backgroundColor: neutralLight,
+                                },
+                            }}
+                        >
+                            My Tickets
+                        </Button>
+
                         <FormControl variant="standard" value={fullName}>
                             <Select
                                 value={fullName}
