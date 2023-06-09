@@ -27,7 +27,10 @@ const registerSchema = yup.object().shape({
         .string()
         .min(2, "Password must be at least 2 characters")
         .required("required"),
-    email: yup.string().email("invalid email").required("required"),
+    email: yup
+        .string()
+        .email("Email must contain @ followed by .com .cz etc")
+        .required("required"),
     password: yup
         .string()
         .min(5, "Password must be at least 5 characters")
@@ -35,7 +38,10 @@ const registerSchema = yup.object().shape({
 });
 
 const loginSchema = yup.object().shape({
-    email: yup.string().email("invalid email").required("required"),
+    email: yup
+        .string()
+        .email("Email must contain @ followed by .com .cz etc")
+        .required("required"),
     password: yup
         .string()
         .min(5, "Password must be at least 5 characters")
@@ -76,17 +82,18 @@ const Form = () => {
         );
 
         console.log(registerResponse);
-        // pridat zelenej bar sucessfully registered
 
         const registered = await registerResponse.json();
         onSubmitProps.resetForm();
 
-        if (registered.error) {
+        if (registerResponse.status === 500) {
             toast.error("User already exists!");
-        } else {
+        } else if (registerResponse.ok) {
             console.log(registered);
             toast.success("User Registered successfully!");
             setPageType("login");
+        } else {
+            toast.error("Error, there was a mistake!");
         }
     };
 
@@ -104,7 +111,7 @@ const Form = () => {
 
         // if it cointanis user dispatch stuff else throw error fix
         if (loggedIn.error) {
-            toast.error("Error, try again !");
+            toast.error("Error, there was a mistake!");
         } else if (loggedIn.user) {
             dispatch(
                 setLogin({
