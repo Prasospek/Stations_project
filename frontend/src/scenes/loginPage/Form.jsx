@@ -60,7 +60,26 @@ const Form = () => {
     const isLogin = pageType === "login";
     const isRegister = pageType === "register";
 
-    const register = async (values, onSubmitProps) => {};
+    const register = async (values, onSubmitProps) => {
+        const registerResponse = await fetch(
+            "http://localhost:8001/auth/register",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(values),
+            }
+        );
+
+        const registered = await registerResponse.json();
+        onSubmitProps.resetForm();
+
+        if (registered) {
+            // Perform any additional actions after successful registration
+            // For example, you might want to show a success message or redirect the user.
+            console.log("User registered successfully!");
+            navigate("/login"); // Redirect the user to the login page
+        }
+    };
 
     const login = async (values, onSubmitProps) => {
         const loggedInResponse = await fetch(
