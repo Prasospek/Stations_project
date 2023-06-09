@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../state/index";
 import FlexBetween from "../../components/FlexBetween";
+import { Snackbar } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -80,10 +81,11 @@ const Form = () => {
         const registered = await registerResponse.json();
         onSubmitProps.resetForm();
 
-        if (registered) {
-            toast("User registered successfully!");
-            <ToastContainer />;
+        if (registered.error) {
+            toast.error("User already exists!");
+        } else {
             console.log(registered);
+            toast.success("User Registered successfully!");
             setPageType("login");
         }
     };
@@ -99,6 +101,7 @@ const Form = () => {
         );
         const loggedIn = await loggedInResponse.json();
         onSubmitProps.resetForm();
+
         if (loggedIn) {
             dispatch(
                 setLogin({
@@ -106,7 +109,10 @@ const Form = () => {
                     token: loggedIn.token,
                 })
             );
+            toast.success("User Logged in !");
             navigate("/home");
+        } else {
+            toast.error("Error, try again !");
         }
     };
 
@@ -244,6 +250,8 @@ const Form = () => {
                                 ? "Don't have an account? Sign Up here."
                                 : "Already have an account? Login here."}
                         </Typography>
+                        {/* ToastContainer */}
+                        <ToastContainer />
                     </Box>
                 </form>
             )}
