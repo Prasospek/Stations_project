@@ -81,9 +81,8 @@ const Form = () => {
         onSubmitProps.resetForm();
 
         if (registered) {
-            // Perform any additional actions after successful registration
-            // For example, you might want to show a success message or redirect the user.
             toast("User registered successfully!");
+            <ToastContainer />;
             console.log(registered);
             setPageType("login");
         }
@@ -119,8 +118,6 @@ const Form = () => {
             await register(values, onSubmitProps);
         }
     };
-
-    const notify = () => toast("Wow so easy!");
 
     return (
         <Formik
@@ -228,6 +225,7 @@ const Form = () => {
                         >
                             {isLogin ? "LOGIN" : "REGISTER"}
                         </Button>
+
                         <Typography
                             onClick={() => {
                                 setPageType(isLogin ? "register" : "login");
