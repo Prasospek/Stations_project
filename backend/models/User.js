@@ -35,7 +35,7 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: true,
             min: 5,
-            match: /^[a-zA-Z0-9]+$/,
+            match: /^[a-zA-Z0-9$./]+$/,
         },
         role: {
             type: String,

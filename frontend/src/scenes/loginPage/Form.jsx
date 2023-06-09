@@ -65,7 +65,6 @@ const Form = () => {
             "http://localhost:8001/auth/register",
             {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(values),
             }
         );
@@ -77,7 +76,8 @@ const Form = () => {
             // Perform any additional actions after successful registration
             // For example, you might want to show a success message or redirect the user.
             console.log("User registered successfully!");
-            navigate("/login"); // Redirect the user to the login page
+            console.log(registered);
+            setPageType("login");
         }
     };
 

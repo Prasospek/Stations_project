@@ -16,7 +16,6 @@ import trainLinesRoutes from "./routes/trainLines.js";
 import issueRoutes from "./routes/issues.js";
 import infoBoardsRoutes from "./routes/infoBoards.js";
 
-
 /* SETUP */
 dotenv.config();
 const app = express();
@@ -25,6 +24,8 @@ app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ extended: true }));
 
 /* ROUTES */
 app.use("/auth", authRoutes);
