@@ -14,6 +14,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../state/index";
 import FlexBetween from "../../components/FlexBetween";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const registerSchema = yup.object().shape({
     firstName: yup
@@ -66,8 +68,14 @@ const Form = () => {
             {
                 method: "POST",
                 body: JSON.stringify(values),
+                headers: {
+                    "Content-Type": "application/json",
+                },
             }
         );
+
+        console.log(registerResponse);
+        // pridat zelenej bar sucessfully registered
 
         const registered = await registerResponse.json();
         onSubmitProps.resetForm();
@@ -75,7 +83,7 @@ const Form = () => {
         if (registered) {
             // Perform any additional actions after successful registration
             // For example, you might want to show a success message or redirect the user.
-            console.log("User registered successfully!");
+            toast("User registered successfully!");
             console.log(registered);
             setPageType("login");
         }
@@ -111,6 +119,8 @@ const Form = () => {
             await register(values, onSubmitProps);
         }
     };
+
+    const notify = () => toast("Wow so easy!");
 
     return (
         <Formik

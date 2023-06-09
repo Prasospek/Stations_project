@@ -4,7 +4,7 @@ import User from "../models/User.js";
 
 // Validate email, firstName, lastName, password
 const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
-const secureRegex = /^[a-zA-Z0-9]+$/;
+const secureRegex = /^[a-zA-Z0-9$./]+$/;
 
 /* REGISTER USER */
 export const register = async (req, res) => {
