@@ -102,6 +102,7 @@ const Form = () => {
         const loggedIn = await loggedInResponse.json();
         onSubmitProps.resetForm();
 
+        // if it cointanis user dispatch stuff else throw error fix
         if (loggedIn.error) {
             toast.error("Error, try again !");
         } else if (loggedIn.user) {
