@@ -53,8 +53,12 @@ const Form = () => {
     const login = async (values, onSubmitProps) => {};
 
     const handleFormSubmit = async (values, onSubmitProps) => {
-        if (isLogin) await login(values, onSubmitProps);
-        if (isRegister) await register(values, onSubmitProps);
+        if (isLogin) {
+            await login(values, onSubmitProps);
+        }
+        if (isRegister) {
+            await register(values, onSubmitProps);
+        }
     };
 
     return (
@@ -90,7 +94,7 @@ const Form = () => {
                                     label="First Name"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
-                                    value={values.firstName}
+                                    value={values.firstName || ""}
                                     name="firstName"
                                     error={
                                         Boolean(touched.firstName) &&
@@ -101,11 +105,12 @@ const Form = () => {
                                     }
                                     sx={{ gridColumn: "span 2" }}
                                 />
+
                                 <TextField
                                     label="Last Name"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
-                                    value={values.lastName}
+                                    value={values.lastName || ""}
                                     name="lastName"
                                     error={
                                         Boolean(touched.lastName) &&
