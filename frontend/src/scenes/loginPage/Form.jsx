@@ -102,7 +102,9 @@ const Form = () => {
         const loggedIn = await loggedInResponse.json();
         onSubmitProps.resetForm();
 
-        if (loggedIn) {
+        if (loggedIn.error) {
+            toast.error("Error, try again !");
+        } else if (loggedIn.user) {
             dispatch(
                 setLogin({
                     user: loggedIn.user,
@@ -112,7 +114,7 @@ const Form = () => {
             toast.success("User Logged in !");
             navigate("/home");
         } else {
-            toast.error("Error, try again !");
+            toast.error("Error, there was a mistake!");
         }
     };
 
