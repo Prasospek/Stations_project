@@ -21,12 +21,12 @@ import "react-toastify/dist/ReactToastify.css";
 const registerSchema = yup.object().shape({
     firstName: yup
         .string()
-        .min(2, "Password must be at least 2 characters")
-        .required("required"),
+        .min(2, "Password must be at least 2 characters a-Z0-9")
+        .required("required and must be at least 2 characters a-Z0-9"),
     lastName: yup
         .string()
-        .min(2, "Password must be at least 2 characters")
-        .required("required"),
+        .min(2, "Password must be at least 2 characters a-Z0-9")
+        .required("required and must be at least 2 characters a-Z0-9"),
     email: yup
         .string()
         .email("Email must contain @ followed by .com .cz etc")
@@ -113,13 +113,14 @@ const Form = () => {
         if (loggedIn.error) {
             toast.error("Error, there was a mistake!");
         } else if (loggedIn.user) {
+            const { user, token } = loggedIn;
             dispatch(
                 setLogin({
                     user: loggedIn.user,
                     token: loggedIn.token,
                 })
             );
-            toast.success("User Logged in !");
+            toast.success(`Welcome, ${user.firstName}!`)
             navigate("/home");
         } else {
             toast.error("Error, there was a mistake!");
