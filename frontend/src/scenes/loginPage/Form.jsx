@@ -16,15 +16,27 @@ import { setLogin } from "../../state/index";
 import FlexBetween from "../../components/FlexBetween";
 
 const registerSchema = yup.object().shape({
-    firstName: yup.string().required("required"),
-    lastName: yup.string().required("required"),
+    firstName: yup
+        .string()
+        .min(2, "Password must be at least 2 characters")
+        .required("required"),
+    lastName: yup
+        .string()
+        .min(2, "Password must be at least 2 characters")
+        .required("required"),
     email: yup.string().email("invalid email").required("required"),
-    password: yup.string().required("required"),
+    password: yup
+        .string()
+        .min(5, "Password must be at least 5 characters")
+        .required("required"),
 });
 
 const loginSchema = yup.object().shape({
     email: yup.string().email("invalid email").required("required"),
-    password: yup.string().required("required"),
+    password: yup
+        .string()
+        .min(5, "Password must be at least 5 characters")
+        .required("required"),
 });
 
 const initialValuesRegister = {
