@@ -42,9 +42,7 @@ const Navbar = () => {
 
     const fullName = `${user.firstName}`;
 
-    const handleTickets = () => {
-        navigate("");
-    };
+    const role = `Role: ${user.role}`;
 
     return (
         <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -91,7 +89,7 @@ const Navbar = () => {
                             },
                         }}
                     >
-                        My Tickets
+                        {role}
                     </Button>
                     <FormControl variant="standard" value={fullName}>
                         <Select
@@ -188,7 +186,7 @@ const Navbar = () => {
                                 },
                             }}
                         >
-                            My Tickets
+                            {role}
                         </Button>
 
                         <FormControl variant="standard" value={fullName}>
