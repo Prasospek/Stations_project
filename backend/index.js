@@ -15,6 +15,7 @@ import ticketRoutes from "./routes/tickets.js";
 import trainLinesRoutes from "./routes/trainLines.js";
 import issueRoutes from "./routes/issues.js";
 import infoBoardsRoutes from "./routes/infoBoards.js";
+import users from "./routes/users.js";
 
 /* SETUP */
 dotenv.config();
@@ -34,6 +35,7 @@ app.use("/tickets", ticketRoutes);
 app.use("/trainlines", trainLinesRoutes);
 app.use("/issues", issueRoutes);
 app.use("/info-boards", infoBoardsRoutes);
+app.use("/users", users);
 
 /* MONGO CONNECTION */
 const PORT = process.env.PORT || 7001;
