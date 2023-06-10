@@ -3,6 +3,7 @@ import Navbar from "../navbar";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Footer from "../footer/footer";
 
 const HomePage = () => {
     const { palette } = useTheme();
@@ -63,6 +64,7 @@ const HomePage = () => {
                     <h2>Display of routes linked to each Station</h2>
                 </Box>
             </Box>
+            <Footer />
         </div>
     );
 };
