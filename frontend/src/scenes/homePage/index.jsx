@@ -12,6 +12,9 @@ const HomePage = () => {
     const isNonMobile = useMediaQuery("(min-width:800px)");
     const isSmallScreen = useMediaQuery("(max-width:600px)");
 
+    const handleStations = () => {
+        navigate("/stations");
+    };
     return (
         <div>
             <Navbar />
@@ -53,6 +56,7 @@ const HomePage = () => {
                     borderRadius="5px"
                     boxShadow="0 2px 5px rgba(0, 0, 0, 0.1)"
                     style={{ cursor: "pointer" }}
+                    onClick={() => handleStations()}
                 >
                     <h2>All Stations</h2>
                 </Box>
