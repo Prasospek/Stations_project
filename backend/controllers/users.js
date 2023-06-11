@@ -1,4 +1,6 @@
-import User from "../models/User";
+import User from "../models/User.js";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 export const getUsers = async (req, res) => {
     try {
@@ -33,7 +35,43 @@ export const getUsersTickets = async (req, res) => {
 };
 
 export const updateUser = async (req, res) => {
+    const { firstName, lastName, email, password } = req.body;
+    const { id } = req.params;
+
+    const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
+    const secureRegex = /^[a-zA-Z0-9$./]+$/;
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    if (
+        !firstName.match(secureRegex) ||
+        !lastName.match(secureRegex) ||
+        !password.match(secureRegex) ||
+        !email.match(emailRegex)
+    ) {
+        return res
+            .status(400)
+            .json({ error: "Invalid format, only usable a-Z 0-9" });
+    }
+
     try {
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            {
+                firstName,
+                lastName,
+                email,
+                password: passwordHash,
+                role: "user",
+            },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: "User not found!" });
+        }
+
+        res.status(200).json(updatedUser);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
