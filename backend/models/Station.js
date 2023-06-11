@@ -8,7 +8,8 @@ const stationSchema = new mongoose.Schema(
             required: true,
         },
         surface: {
-            type: Boolean,
+            type: String,
+            enum: ["ground", "underground"],
             required: true,
         },
         connections: [

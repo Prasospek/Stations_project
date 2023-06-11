@@ -12,11 +12,6 @@ const HomePage = () => {
     const isNonMobile = useMediaQuery("(min-width:800px)");
     const isSmallScreen = useMediaQuery("(max-width:600px)");
 
-    const handleBoxClick = (title) => {
-        // Define the action when a box is clicked
-        console.log(`Clicked: ${title}`);
-    };
-
     return (
         <div>
             <Navbar />
@@ -35,7 +30,6 @@ const HomePage = () => {
                     textAlign="center"
                     borderRadius="5px"
                     boxShadow="0 2px 5px rgba(0, 0, 0, 0.1)"
-                    onClick={() => handleBoxClick("Buy ticket")}
                     style={{ cursor: "pointer" }}
                 >
                     <h2>Buy ticket</h2>
@@ -47,7 +41,6 @@ const HomePage = () => {
                     textAlign="center"
                     borderRadius="5px"
                     boxShadow="0 2px 5px rgba(0, 0, 0, 0.1)"
-                    onClick={() => handleBoxClick("My tickets")}
                     style={{ cursor: "pointer" }}
                 >
                     <h2>My tickets</h2>
@@ -59,7 +52,6 @@ const HomePage = () => {
                     textAlign="center"
                     borderRadius="5px"
                     boxShadow="0 2px 5px rgba(0, 0, 0, 0.1)"
-                    onClick={() => handleBoxClick("All Stations")}
                     style={{ cursor: "pointer" }}
                 >
                     <h2>All Stations</h2>
@@ -71,11 +63,6 @@ const HomePage = () => {
                     textAlign="center"
                     borderRadius="5px"
                     boxShadow="0 2px 5px rgba(0, 0, 0, 0.1)"
-                    onClick={() =>
-                        handleBoxClick(
-                            "Display of routes linked to each Station"
-                        )
-                    }
                     style={{ cursor: "pointer" }}
                 >
                     <h2>Display of routes linked to each Station</h2>
