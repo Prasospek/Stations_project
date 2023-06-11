@@ -1,31 +1,39 @@
 import mongoose from "mongoose";
 
-const issueSchema = new mongoose.Schema({
-    station_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Station",
-        required: true,
-    },
-    description: { 
-        type: String, 
-        required: true 
-    },
-    reported_by: {
-        type: String,
-        required: true,
-        validate: {
-            validator: function (value) {
-                const allowedRoles = ["admin", "technician"];
-                return allowedRoles.includes(value.role);
-            },
-            message: "Invalid role for reported_by",
+const issueSchema = new mongoose.Schema(
+    {
+        station_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Station",
+            required: true,
+        },
+        description: {
+            type: String,
+            required: true,
+        },
+        // reported_by: {
+        //     type: String,
+        //     required: true,
+        //     validate: {
+        //         validator: function (value) {
+        //             const allowedRoles = ["admin", "technician"];
+        //             return allowedRoles.includes(value.role);
+        //         },
+        //         message: "Invalid role for reported_by",
+        //     },
+        // },
+        reported_by: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        reported_date: {
+            type: Date,
+            default: Date.now,
         },
     },
-    reported_date: { 
-        type: Date, 
-        default: Date.now 
-    },
-}, { timestamps: true } );
+    { timestamps: true }
+);
 
 const Issue = mongoose.model("Issue", issueSchema);
 
