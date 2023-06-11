@@ -2,4 +2,11 @@
     text-align: center;
 }
 
-
+@keyframes roll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}

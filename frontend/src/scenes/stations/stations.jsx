@@ -109,14 +109,23 @@ const Stations = () => {
                         >
                             {station.name}
                         </h2>
+
                         <p style={{ marginBottom: "4px" }}>
-                            <b>Surface:</b> {station.surface}
+                            {station.surface === "underground" ? (
+                                <>
+                                    <b>Surface:</b> {station.surface} 🌑
+                                </>
+                            ) : (
+                                <>
+                                    <b>Surface:</b> {station.surface} 🌕
+                                </>
+                            )}
                         </p>
                         <p style={{ marginBottom: "4px" }}>
                             <b>Connections:</b> dodelat dalsi connections!
                         </p>
                         <p style={{ marginBottom: "4px" }}>
-                            <b>Info Board Content: </b>
+                            <b>Info Board: </b>
                             {station.info_board_id && (
                                 <span style={{ fontStyle: "italic" }}>
                                     {infoBoardContents[station._id]}
