@@ -51,16 +51,18 @@ const Stations = () => {
 
             await Promise.all(
                 stations.map(async (station) => {
-                    if (station.info.board_id) {
-                        const content = await fetchAllInfoBoardContents(
+                    if (station.info_board_id) {
+                        const content = await fetchInfoBoardContent(
                             station.info_board_id
                         );
                         infoBoardContentsMap[station._id] = content;
                     }
                 })
             );
+            setInfoBoardContents(infoBoardContentsMap);
         };
-    });
+        fetchAllInfoBoardContents();
+    }, [stations]);
 
     return (
         <div>
@@ -83,11 +85,7 @@ const Stations = () => {
                         <p>
                             <b>Info Board Content: </b>
                             {station.info_board_id && (
-                                <span>
-                                    {fetchInfoBoardContent(
-                                        station.info_board_id
-                                    )}
-                                </span>
+                                <span>{infoBoardContents[station._id]}</span>
                             )}
                         </p>
                     </Box>
