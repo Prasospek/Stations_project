@@ -29,6 +29,15 @@ export const getUser = async (req, res) => {
 
 export const getUsersTickets = async (req, res) => {
     try {
+        const { id } = req.params;
+
+        const foundUser = await User.findById(id);
+
+        if (!foundUser) {
+            return res.status(404).json({ error: "User not found !" });
+        }
+
+        res.status(200).json(foundUser.tickets);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -66,6 +75,10 @@ export const updateUser = async (req, res) => {
             role: "user",
             tickets,
         };
+
+        // Adding password later one in case Admin wanted to change it
+        // This is because of bcrypt and its hash otherwise it was throwing
+        // data and salt required error !
 
         if (password) {
             const passwordHash = await bcrypt.hash(password, salt);
