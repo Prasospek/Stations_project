@@ -1,5 +1,18 @@
-.App {
-    text-align: center;
+.roll-container {
+    width: 100%;
+    overflow: hidden;
+    height: 400px;
+}
+
+.roll-content {
+    display: flex;
+    animation: roll 20s linear infinite;
+}
+
+.roll-content img {
+    width: auto;
+    height: 100%;
+    margin-right: 10px;
 }
 
 @keyframes roll {
@@ -9,15 +22,4 @@
     100% {
         transform: translateX(-100%);
     }
-}
-
-.roll-container {
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-.roll-content {
-    display: inline-block;
-    animation: roll 20s linear infinite;
 }

@@ -124,32 +124,45 @@ const HomePage = () => {
                     overflow: "hidden",
                 }}
             >
-                <div className="roll-container">
-                    <div className="roll-content">
+                <div className="roll-container" style={{ height: "400px" }}>
+                    <div
+                        className="roll-content"
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            height: "100%",
+                        }}
+                    >
                         <img
                             src={`${process.env.PUBLIC_URL}/assets/picture5.jpg`}
                             alt="Credit 1"
-                            style={{ width: "40%", height: "40%" }}
+                            style={{ width: "auto", height: "100%" }}
                         />
                         <img
                             src={`${process.env.PUBLIC_URL}/assets/picture1.jpg`}
                             alt="Credit 2"
-                            style={{ width: "40%", height: "40%" }}
+                            style={{ width: "auto", height: "100%" }}
                         />
                         <img
                             src={`${process.env.PUBLIC_URL}/assets/picture2.jpg`}
                             alt="Credit 3"
-                            style={{ width: "40%", height: "40%" }}
+                            style={{ width: "auto", height: "100%" }}
                         />
                         <img
                             src={`${process.env.PUBLIC_URL}/assets/picture3.jpg`}
-                            alt="Credit 3"
-                            style={{ width: "40%", height: "40%" }}
+                            alt="Credit 4"
+                            style={{ width: "auto", height: "100%" }}
                         />
                         <img
                             src={`${process.env.PUBLIC_URL}/assets/picture4.jpg`}
-                            alt="Credit 3"
-                            style={{ width: "40%", height: "40%" }}
+                            alt="Credit 5"
+                            style={{ width: "auto", height: "100%" }}
+                        />
+                        <img
+                            src={`${process.env.PUBLIC_URL}/assets/picture6.jpg`}
+                            alt="Credit 5"
+                            style={{ width: "auto", height: "100%" }}
                         />
                     </div>
                 </div>
