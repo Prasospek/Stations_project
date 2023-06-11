@@ -6,7 +6,8 @@ import { useSelector } from "react-redux";
 import { ThemeProvider, CssBaseline, createTheme } from "@mui/material";
 import { useMemo } from "react";
 import { themeSettings } from "./theme";
-import Stations from "./scenes/stations/stations";
+import Stations from "./scenes/stations/index.js";
+import MyTickets from "./scenes/myTickets";
 
 function App() {
     //const isAuth = Boolean(useSelector((state) => state.token));
@@ -39,6 +40,12 @@ function App() {
                             path="/stations"
                             element={
                                 isAuth ? <Stations /> : <Navigate to="/" />
+                            }
+                        />
+                        <Route
+                            path="/tickets"
+                            element={
+                                isAuth ? <MyTickets /> : <Navigate to="/" />
                             }
                         />
                     </Routes>
