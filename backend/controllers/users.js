@@ -41,7 +41,6 @@ export const updateUser = async (req, res) => {
     const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
     const secureRegex = /^[a-zA-Z0-9$./]+$/;
     const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
 
     if (
         firstName &&
@@ -60,16 +59,23 @@ export const updateUser = async (req, res) => {
 
     try {
         // Spread so I can only update the field i want and not the Whole object!
+        const updateFields = {
+            ...(firstName && { firstName }),
+            ...(lastName && { lastName }),
+            ...(email && { email }),
+            role: "user",
+            tickets,
+        };
+
+        if (password) {
+            const passwordHash = await bcrypt.hash(password, salt);
+            updateFields.password = passwordHash;
+        }
+
         const updatedUser = await User.findByIdAndUpdate(
             id,
-            {
-                ...(firstName && { firstName }),
-                ...(lastName && { lastName }),
-                ...(email && { email }),
-                ...(password && { password: passwordHash }),
-                role: "user",
-                tickets,
-            },
+            updateFields,
+
             { new: true }
         );
 
