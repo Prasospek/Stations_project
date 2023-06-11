@@ -14,7 +14,7 @@ const Stations = () => {
 
     const [stations, setStations] = useState([]);
 
-    // Fetch stations from the backend or your API
+    // Fetch Stations
     useEffect(() => {
         const fetchStations = async () => {
             try {
@@ -30,26 +30,73 @@ const Stations = () => {
         fetchStations();
     }, []);
 
+    const fetchInfoBoardContent = async (infoBoardId) => {
+        try {
+            const response = await fetch(
+                `http://localhost:8001/info-boards/${infoBoardId}`
+            );
+            const data = await response.json();
+            return data.content;
+        } catch (error) {
+            console.error("Error fetching InfoBoard content:", error);
+            return null;
+        }
+    };
+
+    const [infoBoardContents, setInfoBoardContents] = useState({});
+
+    useEffect(() => {
+        const fetchAllInfoBoardContents = async () => {
+            const infoBoardContentsMap = {};
+
+            await Promise.all(
+                stations.map(async (station) => {
+                    if (station.info.board_id) {
+                        const content = await fetchAllInfoBoardContents(
+                            station.info_board_id
+                        );
+                        infoBoardContentsMap[station._id] = content;
+                    }
+                })
+            );
+        };
+    });
+
     return (
         <div>
             <Navbar />
             <Box p={2}>
-                {stations.map((station) => (
+                {stations.map((station, index) => (
                     <Box
                         key={station._id}
                         bgcolor={palette.primary.main}
                         color={palette.primary.contrastText}
-                        p={2}
                         mb={2}
                     >
-                        <h3>{station.name}</h3>
-                        <p>Surface: {station.surface}</p>
-                        <p>Connections: </p>
-                        <p>Info Board ID: {station.info_board_id}</p>
+                        <h2>{station.name}</h2>
+                        <p>
+                            <b>Surface:</b> {station.surface}
+                        </p>
+                        <p>
+                            <b>Connections:</b>: dodelat dalsi connections !
+                        </p>
+                        <p>
+                            <b>Info Board Content: </b>
+                            {station.info_board_id && (
+                                <span>
+                                    {fetchInfoBoardContent(
+                                        station.info_board_id
+                                    )}
+                                </span>
+                            )}
+                        </p>
                     </Box>
                 ))}
             </Box>
-            <Footer />
+
+            <Box mb={5}>
+                <Footer />
+            </Box>
         </div>
     );
 };
