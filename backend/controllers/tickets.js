@@ -27,11 +27,18 @@ export const getTickets = async (req, res) => {
 
 export const createTicket = async (req, res) => {
     try {
-        const { passenger_id, station_id, purchase_method, destination_id } =
-            req.body;
+        const { station_id, purchase_method, destination_id } = req.body;
+
+        const passenger_id = req.user._id;
+
+        if (!passenger_id) {
+            return res
+                .status(400)
+                .json({ message: "Couldnt find user! createTicket function " });
+        }
 
         const newTicket = new Ticket({
-            passenger_id,
+            passenger_id: passenger_id,
             station_id,
             purchase_method,
             destination_id,
