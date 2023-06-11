@@ -13,6 +13,8 @@ const Stations = () => {
     const isSmallScreen = useMediaQuery("(max-width:600px)");
 
     const [stations, setStations] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     // Fetch Stations
     useEffect(() => {
@@ -21,9 +23,12 @@ const Stations = () => {
                 const response = await fetch("http://localhost:8001/stations");
                 const data = await response.json();
                 setStations(data);
+                setLoading(false);
                 console.log(data);
             } catch (error) {
                 console.error("Error fetching stations:", error);
+                setError("Failed to fetch stations");
+                setLoading(false);
             }
         };
 
@@ -64,28 +69,58 @@ const Stations = () => {
         fetchAllInfoBoardContents();
     }, [stations]);
 
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
     return (
         <div>
             <Navbar />
-            <Box p={2}>
+            <Box
+                p={2}
+                display="flex"
+                flexDirection={isSmallScreen ? "column" : "row"}
+                flexWrap="wrap"
+            >
                 {stations.map((station, index) => (
                     <Box
                         key={station._id}
-                        bgcolor={palette.primary.main}
-                        color={palette.primary.contrastText}
-                        mb={2}
+                        style={{
+                            backgroundColor: palette.primary.main,
+                            color: palette.primary.contrastText,
+                            marginBottom: "16px",
+                            padding: "16px",
+                            borderRadius: "8px",
+                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                            width: isNonMobile ? "calc(50% - 16px)" : "100%",
+                            marginRight:
+                                isNonMobile && index % 2 === 0 ? "16px" : "0",
+                        }}
                     >
-                        <h2>{station.name}</h2>
-                        <p>
+                        <h2
+                            style={{
+                                fontSize: "24px",
+                                marginBottom: "8px",
+                            }}
+                        >
+                            {station.name}
+                        </h2>
+                        <p style={{ marginBottom: "4px" }}>
                             <b>Surface:</b> {station.surface}
                         </p>
-                        <p>
-                            <b>Connections:</b>: dodelat dalsi connections !
+                        <p style={{ marginBottom: "4px" }}>
+                            <b>Connections:</b> dodelat dalsi connections!
                         </p>
-                        <p>
+                        <p style={{ marginBottom: "4px" }}>
                             <b>Info Board Content: </b>
                             {station.info_board_id && (
-                                <span>{infoBoardContents[station._id]}</span>
+                                <span style={{ fontStyle: "italic" }}>
+                                    {infoBoardContents[station._id]}
+                                </span>
                             )}
                         </p>
                     </Box>
