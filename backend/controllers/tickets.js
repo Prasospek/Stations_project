@@ -85,6 +85,10 @@ export const deleteTicket = async (req, res) => {
 
         const deletedTicket = await Ticket.findByIdAndDelete(id);
 
+        if (!deletedTicket) {
+            return res.status(404).json({ error: "User not found !" });
+        }
+
         res.status(204).json(deletedTicket);
     } catch (err) {
         res.status(500).json({ error: err.message });
