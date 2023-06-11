@@ -34,7 +34,11 @@ export const createInfoBoard = async (req, res) => {
             content,
         });
 
-        res.status(201).json(newInfoBoard);
+        const savedInfoBoard = await newInfoBoard.save();
+        res.status(201).json({
+            message: "New InfoBoard successfully created!",
+            savedInfoBoard,
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -58,7 +62,7 @@ export const updateInfoBoard = async (req, res) => {
             return res.status(404).json({ error: "InfoBoard not found !" });
         }
 
-        res.status(204).json(updatedInfoBoard);
+        res.status(200).json(updatedInfoBoard);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
