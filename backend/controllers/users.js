@@ -35,7 +35,7 @@ export const getUsersTickets = async (req, res) => {
 };
 
 export const updateUser = async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, tickets } = req.body;
     const { id } = req.params;
 
     const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
@@ -44,10 +44,14 @@ export const updateUser = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, salt);
 
     if (
-        !firstName.match(secureRegex) ||
-        !lastName.match(secureRegex) ||
-        !password.match(secureRegex) ||
-        !email.match(emailRegex)
+        firstName &&
+        lastName &&
+        password &&
+        email &&
+        (!firstName.match(secureRegex) ||
+            !lastName.match(secureRegex) ||
+            !password.match(secureRegex) ||
+            !email.match(emailRegex))
     ) {
         return res
             .status(400)
@@ -55,14 +59,16 @@ export const updateUser = async (req, res) => {
     }
 
     try {
+        // Spread so I can only update the field i want and not the Whole object!
         const updatedUser = await User.findByIdAndUpdate(
             id,
             {
-                firstName,
-                lastName,
-                email,
-                password: passwordHash,
+                ...(firstName && { firstName }),
+                ...(lastName && { lastName }),
+                ...(email && { email }),
+                ...(password && { password: passwordHash }),
                 role: "user",
+                tickets,
             },
             { new: true }
         );
