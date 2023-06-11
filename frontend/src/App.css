@@ -10,3 +10,14 @@
         transform: translateX(-100%);
     }
 }
+
+.roll-container {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.roll-content {
+    display: inline-block;
+    animation: roll 20s linear infinite;
+}

@@ -4,6 +4,7 @@ import { Box, useMediaQuery, useTheme, Modal, Fade } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Footer from "../footer/footer";
+import { height } from "@mui/system";
 
 const HomePage = () => {
     const { palette } = useTheme();
@@ -123,28 +124,34 @@ const HomePage = () => {
                     overflow: "hidden",
                 }}
             >
-                <div
-                    className="rolling-credits"
-                    style={{
-                        display: "flex",
-                        animation: "roll 20s linear infinite",
-                    }}
-                >
-                    <img
-                        src={`${process.env.PUBLIC_URL}/assets/Train_structure.jpg`}
-                        alt="Image 1"
-                        style={{ width: "40%" }}
-                    />
-                    <img
-                        src={`${process.env.PUBLIC_URL}/assets/Train_structure.jpg`}
-                        alt="Image 2"
-                        style={{ width: "40%" }}
-                    />
-                    <img
-                        src={`${process.env.PUBLIC_URL}/assets/Train_structure.jpg`}
-                        alt="Image 3"
-                        style={{ width: "40%" }}
-                    />
+                <div className="roll-container">
+                    <div className="roll-content">
+                        <img
+                            src={`${process.env.PUBLIC_URL}/assets/picture5.jpg`}
+                            alt="Credit 1"
+                            style={{ width: "40%", height: "40%" }}
+                        />
+                        <img
+                            src={`${process.env.PUBLIC_URL}/assets/picture1.jpg`}
+                            alt="Credit 2"
+                            style={{ width: "40%", height: "40%" }}
+                        />
+                        <img
+                            src={`${process.env.PUBLIC_URL}/assets/picture2.jpg`}
+                            alt="Credit 3"
+                            style={{ width: "40%", height: "40%" }}
+                        />
+                        <img
+                            src={`${process.env.PUBLIC_URL}/assets/picture3.jpg`}
+                            alt="Credit 3"
+                            style={{ width: "40%", height: "40%" }}
+                        />
+                        <img
+                            src={`${process.env.PUBLIC_URL}/assets/picture4.jpg`}
+                            alt="Credit 3"
+                            style={{ width: "40%", height: "40%" }}
+                        />
+                    </div>
                 </div>
             </div>
 
