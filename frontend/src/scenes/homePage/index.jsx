@@ -19,6 +19,10 @@ const HomePage = () => {
         navigate("/stations");
     };
 
+    const handleMyTickets = () => {
+        navigate("/tickets");
+    };
+
     const handleDisplayRoutes = () => {
         setShowModal(true);
     };
@@ -57,6 +61,7 @@ const HomePage = () => {
                     borderRadius="5px"
                     boxShadow="0 2px 5px rgba(0, 0, 0, 0.1)"
                     style={{ cursor: "pointer" }}
+                    onClick={() => handleMyTickets()}
                 >
                     <h2>My tickets</h2>
                 </Box>
