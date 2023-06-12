@@ -12,7 +12,7 @@ import {
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { Snackbar } from "@mui/material";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -42,18 +42,16 @@ const CreateTicket = () => {
     const { palette } = useTheme();
     const dispatch = useDispatch();
     const isNonMobile = useMediaQuery("(min-width:800px)");
-    const [showSnackbar, setShowSnackbar] = useState(false);
+
     const [stations, setStations] = useState([]);
 
     const user = useSelector((state) => state.user._id);
 
     useEffect(() => {
-        // Simulating fetching stations from an API or data source
         const fetchStations = async () => {
             try {
-                const response = await fetch("http://localhost:8001/stations"); // Replace with your API endpoint
+                const response = await fetch("http://localhost:8001/stations");
                 const data = await response.json();
-                console.log("HAHHA", data);
                 setStations(data);
             } catch (error) {
                 console.error("Error fetching stations:", error);
@@ -63,19 +61,22 @@ const CreateTicket = () => {
         fetchStations();
     }, []);
 
-    const submit = async (values, onSubmitProps) => {
-        const loggedInResponse = await fetch("http://localhost:8001/tickets", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(values),
-        });
+    const createTicket = async (values, onSubmitProps) => {
+        const createTicketResponse = await fetch(
+            "http://localhost:8001/tickets",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(values),
+            }
+        );
+        const registered = await createTicketResponse.json();
     };
 
     const handleFormSubmit = async (values, onSubmitProps) => {
-        console.log("Ticket created:", values);
-        submit();
+        createTicket();
+        toast.success("Ticket created successfully!");
         onSubmitProps.resetForm();
-        setShowSnackbar(true);
     };
 
     return (
@@ -90,6 +91,7 @@ const CreateTicket = () => {
             >
                 <Box width="70%">
                     <h2>Buy Ticket</h2>
+
                     <Formik
                         onSubmit={handleFormSubmit}
                         initialValues={initialValues}
@@ -178,7 +180,6 @@ const CreateTicket = () => {
                                     </TextField>
                                 </Box>
 
-                                {/* BUTTON */}
                                 <Button
                                     fullWidth
                                     type="submit"
@@ -194,13 +195,6 @@ const CreateTicket = () => {
                                 >
                                     Create Ticket
                                 </Button>
-
-                                <Snackbar
-                                    open={showSnackbar}
-                                    autoHideDuration={3000}
-                                    onClose={() => setShowSnackbar(false)}
-                                    message="Ticket created successfully!"
-                                />
 
                                 <ToastContainer />
                             </form>
