@@ -69,14 +69,6 @@ export const updateUser = async (req, res) => {
             .json({ error: "Invalid format, only usable a-Z 0-9" });
     }
 
-    const validateAndConvertToObjectId = (values) => {
-        if (!Array.isArray(values)) {
-            return [];
-        }
-
-        return values.filter((value) => isValidObjectId(value));
-    };
-
     try {
         const user = await User.findById(id);
 
@@ -84,14 +76,7 @@ export const updateUser = async (req, res) => {
             return res.status(404).json({ error: "User not found!" });
         }
 
-        // Spread the existing user role only if not specified in the request
         const updatedRole = req.body.role ? req.body.role : user.role;
-
-        // Validate and convert the new tickets to ObjectId
-        const newTickets = validateAndConvertToObjectId(tickets);
-
-        // Create a new array by merging the existing tickets and new tickets
-        const updatedTickets = user.tickets.concat(newTickets);
 
         // Spread so I can only update the fields I want and not the whole object!
         const updateFields = {
@@ -99,7 +84,7 @@ export const updateUser = async (req, res) => {
             ...(lastName && { lastName }),
             ...(email && { email }),
             role: updatedRole,
-            tickets: updatedTickets,
+            ...(tickets && { tickets }),
         };
 
         if (password) {
@@ -107,9 +92,7 @@ export const updateUser = async (req, res) => {
             updateFields.password = passwordHash;
         }
 
-        const updatedUser = await User.findByIdAndUpdate(id, updateFields, {
-            new: true,
-        });
+        const updatedUser = await User.findByIdAndUpdate(id, updateFields);
 
         res.status(200).json({
             message: "User updated successfully",
