@@ -38,14 +38,12 @@ const Tickets = () => {
         fetchTickets();
     }, [user._id]);
 
-
     const fetchStationName = async (stationId) => {
         try {
             const response = await fetch(
                 `http://localhost:8001/stations/${stationId}`
             );
-            const data = await response.save();
-            console.log(data);
+            const data = await response.json();
             return data.name;
         } catch (error) {
             console.error("Error fetching station:", error);
@@ -53,7 +51,52 @@ const Tickets = () => {
         }
     };
 
+    const fetchDestinationName = async (destinationId) => {
+        try {
+            const response = await fetch(
+                `http://localhost:8001/stations/${destinationId}`
+            );
+            const data = await response.json();
+            return data.name;
+        } catch (error) {
+            console.error("Error fetching destination:", error);
+            return null;
+        }
+    };
+
     const [stationNames, setStationNames] = useState({});
+    const [destinationNames, setDestinationNames] = useState({});
+
+    useEffect(() => {
+        const fetchAllStationNames = async () => {
+            const stationNamesMap = {};
+
+            await Promise.all(
+                tickets.map(async (ticket) => {
+                    const name = await fetchStationName(ticket.station_id);
+                    stationNamesMap[ticket.station_id] = name;
+                })
+            );
+            setStationNames(stationNamesMap);
+        };
+
+        const fetchAllDestinationNames = async () => {
+            const destinationNamesMap = {};
+
+            await Promise.all(
+                tickets.map(async (ticket) => {
+                    const name = await fetchDestinationName(
+                        ticket.destination_id
+                    );
+                    destinationNamesMap[ticket.destination_id] = name;
+                })
+            );
+            setDestinationNames(destinationNamesMap);
+        };
+
+        fetchAllStationNames();
+        fetchAllDestinationNames();
+    }, [tickets]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -94,11 +137,13 @@ const Tickets = () => {
                             <b>Purchase method:</b> {ticket.purchase_method}
                         </Typography>
                         <Typography variant="body1">
-                            <b>Station Id NAME ?:</b> {ticket.station_id}
+                            <b>Station Name:</b>{" "}
+                            {stationNames[ticket.station_id] || "Unknown"}
                         </Typography>
                         <Typography variant="body1">
-                            <b>Destination NAME ? ID:</b>:{" "}
-                            {ticket.destination_id}
+                            <b>Destination Name:</b>{" "}
+                            {destinationNames[ticket.destination_id] ||
+                                "Unknown"}
                         </Typography>
                         <Typography variant="body1">
                             <b>Purchase Date: </b>{" "}
