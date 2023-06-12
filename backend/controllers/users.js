@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { isValidObjectId } from "mongoose";
 
 export const getUsers = async (req, res) => {
     try {
@@ -31,7 +32,7 @@ export const getUsersTickets = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // FOR RETRIEVING OBJECT ID -> POPULATE!
+        // FOR RETRIEVING OBJECT ID -> POPULATE!!
         const foundUser = await User.findById(id).populate("tickets");
 
         if (!foundUser) {
@@ -52,6 +53,7 @@ export const updateUser = async (req, res) => {
     const secureRegex = /^[a-zA-Z0-9$./]+$/;
     const salt = await bcrypt.genSalt(10);
 
+    // Validation for firstName, lastName, password, and email
     if (
         firstName &&
         lastName &&
@@ -67,35 +69,47 @@ export const updateUser = async (req, res) => {
             .json({ error: "Invalid format, only usable a-Z 0-9" });
     }
 
+    const validateAndConvertToObjectId = (values) => {
+        if (!Array.isArray(values)) {
+            return [];
+        }
+
+        return values.filter((value) => isValidObjectId(value));
+    };
+
     try {
-        // Spread so I can only update the field i want and not the Whole object!
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found!" });
+        }
+
+        // Spread the existing user role only if not specified in the request
+        const updatedRole = req.body.role ? req.body.role : user.role;
+
+        // Validate and convert the new tickets to ObjectId
+        const newTickets = validateAndConvertToObjectId(tickets);
+
+        // Create a new array by merging the existing tickets and new tickets
+        const updatedTickets = user.tickets.concat(newTickets);
+
+        // Spread so I can only update the fields I want and not the whole object!
         const updateFields = {
             ...(firstName && { firstName }),
             ...(lastName && { lastName }),
             ...(email && { email }),
-            role: "user",
-            tickets,
+            role: updatedRole,
+            tickets: updatedTickets,
         };
-
-        // Adding password later one in case Admin wanted to change it
-        // This is because of bcrypt and its hash otherwise it was throwing
-        // data and salt required error !
 
         if (password) {
             const passwordHash = await bcrypt.hash(password, salt);
             updateFields.password = passwordHash;
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
-            id,
-            updateFields,
-
-            { new: true }
-        );
-
-        if (!updatedUser) {
-            return res.status(404).json({ error: "User not found!" });
-        }
+        const updatedUser = await User.findByIdAndUpdate(id, updateFields, {
+            new: true,
+        });
 
         res.status(200).json({
             message: "User updated successfully",
