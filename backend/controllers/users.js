@@ -84,12 +84,15 @@ export const updateUser = async (req, res) => {
             ...(lastName && { lastName }),
             ...(email && { email }),
             role: updatedRole,
-            ...(tickets && { tickets }),
         };
 
         if (password) {
             const passwordHash = await bcrypt.hash(password, salt);
             updateFields.password = passwordHash;
+        }
+
+        if (tickets) {
+            updateFields.tickets = [...user.tickets, ...tickets];
         }
 
         const updatedUser = await User.findByIdAndUpdate(id, updateFields);
