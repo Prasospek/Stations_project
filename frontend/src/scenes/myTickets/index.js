@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../navbar";
-import { Box, useMediaQuery, useTheme, Typography } from "@mui/material";
+import {
+    Box,
+    useMediaQuery,
+    useTheme,
+    Typography,
+    Button,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Footer from "../footer/footer";
@@ -109,49 +115,93 @@ const Tickets = () => {
     return (
         <div>
             <Navbar />
-
-            <Box sx={{ padding: "16px" }}>
-                <Typography variant="h6">My Tickets</Typography>
-                {tickets.map((ticket, index) => (
-                    <Box
-                        key={ticket._id} // Add the key prop with a unique identifier
-                        sx={{
-                            backgroundColor: palette.primary.main,
-                            color: palette.primary.contrastText,
-                            marginBottom: "16px",
-                            padding: "16px",
-                            borderRadius: "8px",
-                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                            width: isNonMobile ? "calc(50% - 16px)" : "100%",
-                            marginRight:
-                                isNonMobile && index % 2 === 0 ? "16px" : "0",
+            {tickets.length > 0 ? (
+                <Box sx={{ padding: "16px" }}>
+                    <h1
+                        style={{
+                            fontSize: "28px",
+                            marginBottom: "15px",
                         }}
                     >
-                        <Typography variant="body1">
-                            <b>Passenger ID:</b> {ticket.passenger_id}
-                        </Typography>
-                        <Typography variant="body1">
-                            <b>Ticket ID:</b> {ticket._id}
-                        </Typography>
-                        <Typography variant="body1">
-                            <b>Purchase method:</b> {ticket.purchase_method}
-                        </Typography>
-                        <Typography variant="body1">
-                            <b>Station Name:</b>{" "}
-                            {stationNames[ticket.station_id] || "Unknown"}
-                        </Typography>
-                        <Typography variant="body1">
-                            <b>Destination Name:</b>{" "}
-                            {destinationNames[ticket.destination_id] ||
-                                "Unknown"}
-                        </Typography>
-                        <Typography variant="body1">
-                            <b>Purchase Date: </b>{" "}
-                            {new Date(ticket.purchase_date).toLocaleString()}
-                        </Typography>
+                        My Tickets
+                    </h1>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            "& > div": {
+                                backgroundColor: palette.primary.main,
+                                color: palette.primary.contrastText,
+                                marginBottom: "16px",
+                                padding: "16px",
+                                borderRadius: "8px",
+                                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                width: isNonMobile
+                                    ? "calc(50% - 16px)"
+                                    : "100%",
+                                marginRight:
+                                    isNonMobile && !isSmallScreen && "16px",
+                            },
+                        }}
+                    >
+                        {tickets.map((ticket) => (
+                            <Box
+                                key={ticket._id} // Add the key prop with a unique identifier
+                            >
+                                <Typography variant="body1">
+                                    <b>Passenger ID:</b> {ticket.passenger_id}
+                                </Typography>
+                                <Typography variant="body1">
+                                    <b>Ticket ID:</b> {ticket._id}
+                                </Typography>
+                                <Typography variant="body1">
+                                    <b>Purchase method:</b>{" "}
+                                    {ticket.purchase_method}
+                                </Typography>
+                                <Typography variant="body1">
+                                    <b>Station Name:</b>{" "}
+                                    {stationNames[ticket.station_id] ||
+                                        "Unknown"}
+                                </Typography>
+                                <Typography variant="body1">
+                                    <b>Destination Name:</b>{" "}
+                                    {destinationNames[ticket.destination_id] ||
+                                        "Unknown"}
+                                </Typography>
+                                <Typography variant="body1">
+                                    <b>Purchase Date: </b>{" "}
+                                    {new Date(
+                                        ticket.purchase_date
+                                    ).toLocaleString()}
+                                </Typography>
+                            </Box>
+                        ))}
                     </Box>
-                ))}
-            </Box>
+                </Box>
+            ) : (
+                <Box
+                    sx={{
+                        margin: "20px auto",
+                        textAlign: "center",
+                    }}
+                >
+                    <Typography
+                        variant="h2"
+                        sx={{
+                            margin: "0 0 10px",
+                        }}
+                    >
+                        You have no tickets ! Would you like to buy one?
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => navigate("/tickets")}
+                    >
+                        Buy Ticket
+                    </Button>
+                </Box>
+            )}
 
             <Footer />
         </div>

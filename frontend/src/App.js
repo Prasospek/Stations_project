@@ -49,6 +49,12 @@ function App() {
                                 isAuth ? <MyTickets /> : <Navigate to="/" />
                             }
                         />
+                         <Route
+                            path={`/tickets`}
+                            element={
+                                isAuth ? <MyTickets /> : <Navigate to="/" />
+                            }
+                        />
                         {/* Fallback for invalid routes */}
                         <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
