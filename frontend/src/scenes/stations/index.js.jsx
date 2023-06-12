@@ -35,6 +35,21 @@ const Stations = () => {
         fetchStations();
     }, []);
 
+    const [connections, setConnections] = useState({});
+
+    const fetchStationConnections = async (stationId) => {
+        try {
+            const response = await fetch(
+                `http://localhost:8001/stations/${stationId}/connections`
+            );
+            const data = await response.json();
+            setConnections(data);
+            console.log(data);
+        } catch (error) {
+            console.error("Error fetching station connections:", error);
+        }
+    };
+
     const fetchInfoBoardContent = async (infoBoardId) => {
         try {
             const response = await fetch(
@@ -122,8 +137,22 @@ const Stations = () => {
                             )}
                         </p>
                         <p style={{ marginBottom: "4px" }}>
-                            <b>Connections:</b> dodelat dalsi connections!
+                            <b>Connections:</b>{" "}
+                            {connections[station._id]
+                                ? connections[station._id].map(
+                                      (connection, i) => (
+                                          <span key={i}>
+                                              {connection}
+                                              {i !==
+                                              connection[station._id].length - 1
+                                                  ? ", "
+                                                  : ""}
+                                          </span>
+                                      )
+                                  )
+                                : "No Connections available!"}
                         </p>
+
                         <p style={{ marginBottom: "4px" }}>
                             <b>Info Board: </b>
                             {station.info_board_id && (

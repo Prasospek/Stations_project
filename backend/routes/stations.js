@@ -5,6 +5,7 @@ import {
     createStation,
     updateStation,
     deleteStation,
+    getStationConnections,
 } from "../controllers/stations.js";
 
 const router = express.Router();
