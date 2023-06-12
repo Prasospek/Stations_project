@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../navbar";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, useMediaQuery, useTheme, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Footer from "../footer/footer";
 
-const Stations = () => {
+const Tickets = () => {
     const { palette } = useTheme();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -18,7 +18,8 @@ const Stations = () => {
 
     const user = useSelector((state) => state.user);
 
-    // Fetch Stations
+    
+
     useEffect(() => {
         const fetchTickets = async () => {
             try {
@@ -37,7 +38,7 @@ const Stations = () => {
         };
 
         fetchTickets();
-    }, [user._id]); // here as dependency because the value will / could change
+    }, [user._id]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -51,9 +52,41 @@ const Stations = () => {
         <div>
             <Navbar />
 
+            <Box sx={{ padding: "16px" }}>
+                <Typography variant="h6">My Tickets</Typography>
+                {tickets.map((ticket) => (
+                    <Box
+                        key={ticket._id}
+                        sx={{
+                            border: `1px solid ${palette.divider}`,
+                            borderRadius: "8px",
+                            padding: "16px",
+                            margin: "8px 0",
+                        }}
+                    >
+                        <Typography variant="body1">
+                            Passenger ID: {ticket.passenger_id}
+                        </Typography>
+                        <Typography variant="body1">
+                            Ticket ID: {ticket.ticket_id}
+                        </Typography>
+                        <Typography variant="body1">
+                            Purchase Method: {ticket.purchase_method}
+                        </Typography>
+                        <Typography variant="body1">
+                            Destination ID: {ticket.destination_id}
+                        </Typography>
+                        <Typography variant="body1">
+                            Purchase Date:{" "}
+                            {new Date(ticket.purchase_date).toLocaleString()}
+                        </Typography>
+                    </Box>
+                ))}
+            </Box>
+
             <Footer />
         </div>
     );
 };
 
-export default Stations;
+export default Tickets;

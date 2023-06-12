@@ -43,10 +43,12 @@ const UserSchema = new mongoose.Schema(
             default: "user",
             match: /^[a-zA-Z]+$/,
         },
-        tickets: {
-            type: Array,
-            default: [],
-        },
+        tickets: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Ticket",
+            },
+        ],
     },
     { timestamps: true }
 );
