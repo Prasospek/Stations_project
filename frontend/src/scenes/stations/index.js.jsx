@@ -97,9 +97,9 @@ const Stations = () => {
                             padding: "0 14px 14px",
                             borderRadius: "8px",
                             boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                            width: isNonMobile ? "calc(50% - 16px)" : "100%",
+                            width: isNonMobile ? "calc(50% - 15px)" : "100%",
                             marginRight:
-                                isNonMobile && index % 2 === 0 ? "16px" : "0",
+                                isNonMobile && index % 2 === 0 ? "15px" : "0",
                         }}
                     >
                         <h2
@@ -118,7 +118,7 @@ const Stations = () => {
                             style={{
                                 marginBottom: "4px",
                                 fontFamily: "Arial, sans-serif",
-                                fontSize: "14px",
+                                fontSize: "15px",
                             }}
                         >
                             {station.surface === "underground" ? (
@@ -136,7 +136,7 @@ const Stations = () => {
                                 style={{
                                     marginBottom: "4px",
                                     fontFamily: "Arial, sans-serif",
-                                    fontSize: "14px",
+                                    fontSize: "15px",
                                 }}
                             >
                                 <b>Connections:</b>{" "}
@@ -164,7 +164,7 @@ const Stations = () => {
                             style={{
                                 marginBottom: "4px",
                                 fontFamily: "Arial, sans-seriff",
-                                fontSize: "14px",
+                                fontSize: "15px",
                             }}
                         >
                             <b>InfoBoard:</b> {infoBoardContents[station._id]}

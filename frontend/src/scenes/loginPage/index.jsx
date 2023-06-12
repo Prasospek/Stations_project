@@ -31,8 +31,8 @@ const LoginPage = () => {
                     variant={"h5"}
                     sx={{ mb: "1.5rem" }}
                 >
-                    Welcome to Mars Tracks! Best place to buy tickets to get around
-                    Mars!
+                    Welcome to Mars Tracks! Best place to buy tickets to get
+                    around Mars!
                 </Typography>
                 <Form />
             </Box>
