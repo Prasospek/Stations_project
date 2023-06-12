@@ -17,7 +17,22 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ticketSchema = yup.object().shape({
-    station_id: yup.string().required("Starter Station needs to be required "),
+    station_id: yup
+        .string()
+        .oneOf(
+            [
+                "Station1",
+                "Station2",
+                "Station3",
+                "Station4",
+                "Station5",
+                "Station6",
+                "Station7",
+            ],
+            "Invalid Starter Station"
+        )
+        .required("Starter Station is required")
+        .min(7, "Select please Either of viable Stations"),
     purchase_method: yup
         .string()
         .oneOf(
@@ -27,7 +42,20 @@ const ticketSchema = yup.object().shape({
         .required("Purchase Method is required"),
     destination_id: yup
         .string()
-        .required("Destination Station needs to be required "),
+        .oneOf(
+            [
+                "Station1",
+                "Station2",
+                "Station3",
+                "Station4",
+                "Station5",
+                "Station6",
+                "Station7",
+            ],
+            "Invalid Destination Station"
+        )
+        .min(7, "Select please Either of viable Stations")
+        .required("Destination Station is required"),
 });
 
 const initialValues = {
@@ -124,15 +152,15 @@ const CreateTicket = () => {
                                         label="Starter Station"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        value={values.station_name}
-                                        name="station_name"
+                                        value={values.station_id} // Update the field name
+                                        name="station_id" // Update the field name
                                         error={
-                                            Boolean(touched.station_name) &&
-                                            Boolean(errors.station_name)
+                                            Boolean(touched.station_id) &&
+                                            Boolean(errors.station_id)
                                         }
                                         helperText={
-                                            touched.station_name &&
-                                            errors.station_name
+                                            touched.station_id &&
+                                            errors.station_id
                                         }
                                         sx={{ gridColumn: "span 4" }}
                                     />
@@ -141,15 +169,15 @@ const CreateTicket = () => {
                                         label="Destination Station"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        value={values.destination_name}
-                                        name="destination_name"
+                                        value={values.destination_id} // Update the field name
+                                        name="destination_id" // Update the field name
                                         error={
-                                            Boolean(touched.destination_name) &&
-                                            Boolean(errors.destination_name)
+                                            Boolean(touched.destination_id) &&
+                                            Boolean(errors.destination_id)
                                         }
                                         helperText={
-                                            touched.destination_name &&
-                                            errors.destination_name
+                                            touched.destination_id &&
+                                            errors.destination_id
                                         }
                                         sx={{ gridColumn: "span 4" }}
                                     />
