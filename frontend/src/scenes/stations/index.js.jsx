@@ -70,19 +70,6 @@ const Stations = () => {
         fetchAllInfoBoardContents();
     }, [stations]);
 
-    const fetchStations = async () => {
-        try {
-            const response = await fetch("http://localhost:8001/stations");
-            const data = response.json();
-
-            //const stationsWithConnectiosn = await Station;
-        } catch (error) {
-            console.error("Error fetching stations:", error);
-            setError("Failed to fetch stations");
-            setLoading(false);
-        }
-    };
-
     if (loading) {
         return <div>Loading...</div>;
     }

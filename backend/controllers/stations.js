@@ -54,21 +54,21 @@ export const updateStation = async (req, res) => {
             return res.status(404).json({ error: "Station not found!" });
         }
 
-        const updatedConnections = [...station.connections];
+        let updatedConnections = [];
 
-        if (connections) {
-            // Add new connections to the updated connections array
-            connections.forEach((connection) => {
-                if (!updatedConnections.includes(connection)) {
-                    updatedConnections.push(connection);
-                }
-            });
+        if (Array.isArray(connections) && connections.length > 0) {
+            updatedConnections = connections;
         }
 
+        // Update the connections of the current station
         station.name = name || station.name;
         station.surface = surface || station.surface;
         station.connections = updatedConnections;
         station.info_board_id = info_board_id || station.info_board_id;
+
+        for (const connectionId of updatedConnections) {
+            const connectedStation = await Station.findById(connectionId);
+        }
 
         const updatedStation = await station.save();
 
