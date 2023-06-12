@@ -12,17 +12,21 @@ const Stations = () => {
     const isNonMobile = useMediaQuery("(min-width:800px)");
     const isSmallScreen = useMediaQuery("(max-width:600px)");
 
-    const [stations, setStations] = useState([]);
+    const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const user = useSelector((state) => state.user);
+
     // Fetch Stations
     useEffect(() => {
-        const fetchStations = async () => {
+        const fetchTickets = async () => {
             try {
-                const response = await fetch("http://localhost:8001/stations");
+                const response = await fetch(
+                    `http://localhost:8001/users/${user._id}/tickets`
+                );
                 const data = await response.json();
-                setStations(data);
+                setTickets(data);
                 setLoading(false);
                 console.log(data);
             } catch (error) {
@@ -32,10 +36,8 @@ const Stations = () => {
             }
         };
 
-        fetchStations();
-    }, []);
-
-
+        fetchTickets();
+    }, [user._id]); // here as dependency because the value will / could change
 
     if (loading) {
         return <div>Loading...</div>;

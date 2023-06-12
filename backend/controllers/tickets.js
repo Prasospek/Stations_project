@@ -42,6 +42,7 @@ export const createTicket = async (req, res) => {
             station_id,
             purchase_method,
             destination_id,
+            purchase_date: Date.now(),
         });
 
         await newTicket.save();
@@ -86,7 +87,7 @@ export const deleteTicket = async (req, res) => {
         const deletedTicket = await Ticket.findByIdAndDelete(id);
 
         if (!deletedTicket) {
-            return res.status(404).json({ error: "User not found !" });
+            return res.status(404).json({ error: "Ticket not found !" });
         }
 
         res.status(204).json(deletedTicket);

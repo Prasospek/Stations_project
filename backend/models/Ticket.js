@@ -25,7 +25,7 @@ const ticketSchema = new mongoose.Schema(
         },
         purchase_date: {
             type: Date,
-            default: Date.now,
+            default: Date.now(),
         },
     },
     { timestamps: true }
