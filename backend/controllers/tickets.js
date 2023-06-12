@@ -1,4 +1,5 @@
 import Ticket from "../models/Ticket.js";
+import User from "../models/User.js";
 
 export const getTicket = async (req, res) => {
     try {
@@ -89,6 +90,17 @@ export const deleteTicket = async (req, res) => {
 
         if (!deletedTicket) {
             return res.status(404).json({ error: "Ticket not found !" });
+        }
+
+        
+        // Remove the reference to the deleted ticket from the user's tickets array
+        const user = await User.findOneAndUpdate(
+            { tickets: id },
+            { $pull: { tickets: id } }
+        );
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found!" });
         }
 
         res.status(204).json(deletedTicket);
