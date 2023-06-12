@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../navbar";
 import { Box, useMediaQuery, useTheme, Modal, Fade } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Footer from "../footer/footer";
 import { height } from "@mui/system";
@@ -12,6 +12,7 @@ const HomePage = () => {
     const navigate = useNavigate();
     const isNonMobile = useMediaQuery("(min-width:800px)");
     const isSmallScreen = useMediaQuery("(max-width:600px)");
+    const user = useSelector((state) => state.user);
 
     const [showModal, setShowModal] = useState(false);
 
@@ -20,7 +21,7 @@ const HomePage = () => {
     };
 
     const handleMyTickets = () => {
-        navigate("/tickets");
+        navigate(`/users/${user._id}/tickets`);
     };
 
     const handleDisplayRoutes = () => {

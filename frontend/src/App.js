@@ -13,6 +13,7 @@ function App() {
     //const isAuth = Boolean(useSelector((state) => state.token));
     const mode = useSelector((state) => state.mode);
     const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
+    const user = useSelector((state) => state.user);
 
     const isAuth = Boolean(
         useSelector((state) => {
@@ -43,7 +44,7 @@ function App() {
                             }
                         />
                         <Route
-                            path="/tickets"
+                            path={`/users/:id/tickets`}
                             element={
                                 isAuth ? <MyTickets /> : <Navigate to="/" />
                             }

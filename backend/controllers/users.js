@@ -29,7 +29,7 @@ export const getUser = async (req, res) => {
 
 export const getUsersTickets = async (req, res) => {
     try {
-        const { id } = req.header;
+        const { id } = req.params;
 
         const foundUser = await User.findById(id);
 
