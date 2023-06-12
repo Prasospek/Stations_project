@@ -8,6 +8,7 @@ import { useMemo } from "react";
 import { themeSettings } from "./theme";
 import Stations from "./scenes/stations/index.js";
 import MyTickets from "./scenes/myTickets";
+import CreateTicket from "./scenes/createTicket";
 
 function App() {
     //const isAuth = Boolean(useSelector((state) => state.token));
@@ -49,10 +50,10 @@ function App() {
                                 isAuth ? <MyTickets /> : <Navigate to="/" />
                             }
                         />
-                         <Route
+                        <Route
                             path={`/tickets`}
                             element={
-                                isAuth ? <MyTickets /> : <Navigate to="/" />
+                                isAuth ? <CreateTicket /> : <Navigate to="/" />
                             }
                         />
                         {/* Fallback for invalid routes */}
