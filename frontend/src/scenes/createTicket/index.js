@@ -18,7 +18,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const ticketSchema = yup.object().shape({
     passenger_id: yup.string().required("Passenger ID is required"),
-    station_id: yup.string().required("Station ID is required"),
+    station_id: yup.string().required("Starter Station needs to be required "),
     purchase_method: yup
         .string()
         .oneOf(
@@ -26,7 +26,9 @@ const ticketSchema = yup.object().shape({
             "Purchase Method must be either 'station' or 'online'"
         )
         .required("Purchase Method is required"),
-    destination_id: yup.string().required("Destination ID is required"),
+    destination_id: yup
+        .string()
+        .required("Destination Station needs to be required "),
     purchase_date: yup.date().required("Purchase Date is required"),
 });
 
@@ -51,8 +53,9 @@ const CreateTicket = () => {
         // Simulating fetching stations from an API or data source
         const fetchStations = async () => {
             try {
-                const response = await fetch("api/stations"); // Replace with your API endpoint
+                const response = await fetch("http://localhost:8001/stations"); // Replace with your API endpoint
                 const data = await response.json();
+                console.log("HAHHA", data);
                 setStations(data);
             } catch (error) {
                 console.error("Error fetching stations:", error);
@@ -61,8 +64,6 @@ const CreateTicket = () => {
 
         fetchStations();
     }, []);
-
-    console.log(stations);
 
     const handleFormSubmit = async (values, onSubmitProps) => {
         console.log("Ticket created:", values);
@@ -127,14 +128,15 @@ const CreateTicket = () => {
                                         sx={{ gridColumn: "span 4" }}
                                         select
                                     >
-                                        {stations.map((station) => (
-                                            <MenuItem
-                                                key={station.id}
-                                                value={station.id}
-                                            >
-                                                {station.name}
-                                            </MenuItem>
-                                        ))}
+                                        {stations &&
+                                            stations.map((station) => (
+                                                <MenuItem
+                                                    key={station.id}
+                                                    value={station.id}
+                                                >
+                                                    {station.name}
+                                                </MenuItem>
+                                            ))}
                                     </TextField>
                                     <TextField
                                         label="Destination Station"
@@ -153,14 +155,15 @@ const CreateTicket = () => {
                                         sx={{ gridColumn: "span 4" }}
                                         select
                                     >
-                                        {stations.map((station) => (
-                                            <MenuItem
-                                                key={station.id}
-                                                value={station.id}
-                                            >
-                                                {station.name}
-                                            </MenuItem>
-                                        ))}
+                                        {stations &&
+                                            stations.map((station) => (
+                                                <MenuItem
+                                                    key={station.id}
+                                                    value={station.id}
+                                                >
+                                                    {station.name}
+                                                </MenuItem>
+                                            ))}
                                     </TextField>
                                     <TextField
                                         label="Purchase Method"
