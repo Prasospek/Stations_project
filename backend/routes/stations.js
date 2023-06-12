@@ -12,6 +12,7 @@ const router = express.Router();
 /*GET */
 router.get("/", getStations); // ziskani seznamu vsech stanic
 router.get("/:id", getStation); // ziskani detailu konkretni stanice
+router.get("/:id/connections", getStationConnections);
 
 /* POST */
 router.post("/", createStation); // vytvoreni nove stanice

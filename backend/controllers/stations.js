@@ -63,7 +63,6 @@ export const updateStation = async (req, res) => {
             return res.status(404).json({ error: "Station not found !" });
         }
 
-
         res.status(200).json(updatedStation);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -81,6 +80,22 @@ export const deleteStation = async (req, res) => {
         }
 
         res.status(204).json(deletedStation);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getStationConnections = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const foundStation = await Station.findById(id);
+
+        if (!foundStation) {
+            return res.status(404).json({ error: "Station not found !" });
+        }
+
+        res.status(200).json(foundStation.connections);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
