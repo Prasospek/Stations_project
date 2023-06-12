@@ -120,7 +120,7 @@ const Form = () => {
                     token: loggedIn.token,
                 })
             );
-            toast.success(`Welcome, ${user.firstName}!`)
+            toast.success(`Welcome, ${user.firstName}!`);
             navigate("/home");
         } else {
             toast.error("Error, there was a mistake!");

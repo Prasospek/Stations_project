@@ -17,7 +17,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ticketSchema = yup.object().shape({
-    passenger_id: yup.string().required("Passenger ID is required"),
     station_id: yup.string().required("Starter Station needs to be required "),
     purchase_method: yup
         .string()
@@ -29,15 +28,14 @@ const ticketSchema = yup.object().shape({
     destination_id: yup
         .string()
         .required("Destination Station needs to be required "),
-    purchase_date: yup.date().required("Purchase Date is required"),
 });
 
 const initialValues = {
-    passenger_id: "",
-    station_id: "",
+    station_id: "", // Update the field name
+    station_name: "",
     purchase_method: "",
-    destination_id: "",
-    purchase_date: "",
+    destination_id: "", // Update the field name
+    destination_name: "",
 };
 
 const CreateTicket = () => {
@@ -65,8 +63,17 @@ const CreateTicket = () => {
         fetchStations();
     }, []);
 
+    const submit = async (values, onSubmitProps) => {
+        const loggedInResponse = await fetch("http://localhost:8001/tickets", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(values),
+        });
+    };
+
     const handleFormSubmit = async (values, onSubmitProps) => {
         console.log("Ticket created:", values);
+        submit();
         onSubmitProps.resetForm();
         setShowSnackbar(true);
     };
@@ -115,56 +122,36 @@ const CreateTicket = () => {
                                         label="Starter Station"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        value={values.station_id}
-                                        name="station_id"
+                                        value={values.station_name}
+                                        name="station_name"
                                         error={
-                                            Boolean(touched.station_id) &&
-                                            Boolean(errors.station_id)
+                                            Boolean(touched.station_name) &&
+                                            Boolean(errors.station_name)
                                         }
                                         helperText={
-                                            touched.station_id &&
-                                            errors.station_id
+                                            touched.station_name &&
+                                            errors.station_name
                                         }
                                         sx={{ gridColumn: "span 4" }}
-                                        select
-                                    >
-                                        {stations &&
-                                            stations.map((station) => (
-                                                <MenuItem
-                                                    key={station.id}
-                                                    value={station.id}
-                                                >
-                                                    {station.name}
-                                                </MenuItem>
-                                            ))}
-                                    </TextField>
+                                    />
+
                                     <TextField
                                         label="Destination Station"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        value={values.destination_id}
-                                        name="destination_id"
+                                        value={values.destination_name}
+                                        name="destination_name"
                                         error={
-                                            Boolean(touched.destination_id) &&
-                                            Boolean(errors.destination_id)
+                                            Boolean(touched.destination_name) &&
+                                            Boolean(errors.destination_name)
                                         }
                                         helperText={
-                                            touched.destination_id &&
-                                            errors.destination_id
+                                            touched.destination_name &&
+                                            errors.destination_name
                                         }
                                         sx={{ gridColumn: "span 4" }}
-                                        select
-                                    >
-                                        {stations &&
-                                            stations.map((station) => (
-                                                <MenuItem
-                                                    key={station.id}
-                                                    value={station.id}
-                                                >
-                                                    {station.name}
-                                                </MenuItem>
-                                            ))}
-                                    </TextField>
+                                    />
+
                                     <TextField
                                         label="Purchase Method"
                                         onBlur={handleBlur}

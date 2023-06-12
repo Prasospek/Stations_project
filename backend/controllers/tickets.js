@@ -28,10 +28,9 @@ export const getTickets = async (req, res) => {
 
 export const createTicket = async (req, res) => {
     try {
-        const { station_id, purchase_method, destination_id, passenger_id } =
-            req.body;
+        const { station_id, purchase_method, destination_id } = req.body;
 
-        //const passenger_id = req.user._id;
+        const passenger_id = req.user._id;
 
         if (!passenger_id) {
             return res
