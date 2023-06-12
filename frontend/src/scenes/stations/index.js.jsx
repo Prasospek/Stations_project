@@ -24,7 +24,7 @@ const Stations = () => {
                 const data = await response.json();
                 setStations(data);
                 setLoading(false);
-                console.log("HAHAHAHA", data);
+                console.log(data);
             } catch (error) {
                 console.error("Error fetching stations:", error);
                 setError("Failed to fetch stations");
