@@ -38,6 +38,23 @@ const Tickets = () => {
         fetchTickets();
     }, [user._id]);
 
+
+    const fetchStationName = async (stationId) => {
+        try {
+            const response = await fetch(
+                `http://localhost:8001/stations/${stationId}`
+            );
+            const data = await response.save();
+            console.log(data);
+            return data.name;
+        } catch (error) {
+            console.error("Error fetching station:", error);
+            return null;
+        }
+    };
+
+    const [stationNames, setStationNames] = useState({});
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -52,30 +69,39 @@ const Tickets = () => {
 
             <Box sx={{ padding: "16px" }}>
                 <Typography variant="h6">My Tickets</Typography>
-                {tickets.map((ticket) => (
+                {tickets.map((ticket, index) => (
                     <Box
                         key={ticket._id} // Add the key prop with a unique identifier
                         sx={{
-                            border: `1px solid ${palette.divider}`,
-                            borderRadius: "8px",
+                            backgroundColor: palette.primary.main,
+                            color: palette.primary.contrastText,
+                            marginBottom: "16px",
                             padding: "16px",
-                            margin: "8px 0",
+                            borderRadius: "8px",
+                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                            width: isNonMobile ? "calc(50% - 16px)" : "100%",
+                            marginRight:
+                                isNonMobile && index % 2 === 0 ? "16px" : "0",
                         }}
                     >
                         <Typography variant="body1">
-                            Passenger ID: {ticket.passenger_id}
+                            <b>Passenger ID:</b> {ticket.passenger_id}
                         </Typography>
                         <Typography variant="body1">
-                            Ticket ID: {ticket.ticket_id}
+                            <b>Ticket ID:</b> {ticket._id}
                         </Typography>
                         <Typography variant="body1">
-                            Purchase Method: {ticket.purchase_method}
+                            <b>Purchase method:</b> {ticket.purchase_method}
                         </Typography>
                         <Typography variant="body1">
-                            Destination ID: {ticket.destination_id}
+                            <b>Station Id NAME ?:</b> {ticket.station_id}
                         </Typography>
                         <Typography variant="body1">
-                            Purchase Date:{" "}
+                            <b>Destination NAME ? ID:</b>:{" "}
+                            {ticket.destination_id}
+                        </Typography>
+                        <Typography variant="body1">
+                            <b>Purchase Date: </b>{" "}
                             {new Date(ticket.purchase_date).toLocaleString()}
                         </Typography>
                     </Box>
