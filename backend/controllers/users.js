@@ -31,7 +31,8 @@ export const getUsersTickets = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const foundUser = await User.findById(id);
+        // FOR RETRIEVING OBJECT ID -> POPULATE!
+        const foundUser = await User.findById(id).populate("tickets");
 
         if (!foundUser) {
             return res.status(404).json({ error: "User not found !" });

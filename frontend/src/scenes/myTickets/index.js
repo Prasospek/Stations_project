@@ -18,8 +18,6 @@ const Tickets = () => {
 
     const user = useSelector((state) => state.user);
 
-    
-
     useEffect(() => {
         const fetchTickets = async () => {
             try {
@@ -56,7 +54,7 @@ const Tickets = () => {
                 <Typography variant="h6">My Tickets</Typography>
                 {tickets.map((ticket) => (
                     <Box
-                        key={ticket._id}
+                        key={ticket._id} // Add the key prop with a unique identifier
                         sx={{
                             border: `1px solid ${palette.divider}`,
                             borderRadius: "8px",
