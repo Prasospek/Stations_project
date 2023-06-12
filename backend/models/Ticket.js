@@ -15,9 +15,10 @@ const ticketSchema = new mongoose.Schema(
         },
         purchase_method: {
             type: String,
-            enum: ["online", "station"],
+            enum: ["Online", "Station"],
             required: true,
         },
+
         destination_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Station",
