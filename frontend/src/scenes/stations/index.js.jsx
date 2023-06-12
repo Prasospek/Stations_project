@@ -122,25 +122,20 @@ const Stations = () => {
                                 </>
                             )}
                         </p>
-                        <p style={{ marginBottom: "4px" }}>
-                            <b>Connections:</b>{" "}
-                            {station.connections.map((connectId) => {
-                                const connectedStation = stations.find(
-                                    (station) => station._id === connectId
-                                );
-                                return connectedStation
-                                    ? `${connectedStation.name}, `
-                                    : "";
-                            })}
-                        </p>
-                        <p style={{ marginBottom: "4px" }}>
-                            <b>Info Board: </b>
-                            {station.info_board_id && (
-                                <span style={{ fontStyle: "italic" }}>
-                                    {infoBoardContents[station._id]}
-                                </span>
-                            )}
-                        </p>
+                        {station.connections && (
+                            <p style={{ marginBottom: "4px" }}>
+                                <b>Connections:</b>{" "}
+                                {station.connections.map((connectionId) => {
+                                    const connectedStation = stations.find(
+                                        (station) =>
+                                            station._id === connectionId
+                                    );
+                                    return connectedStation
+                                        ? `${connectedStation.name}, `
+                                        : "";
+                                })}
+                            </p>
+                        )}
                     </Box>
                 ))}
             </Box>
