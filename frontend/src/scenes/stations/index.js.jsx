@@ -93,8 +93,8 @@ const Stations = () => {
                         style={{
                             backgroundColor: palette.primary.main,
                             color: palette.primary.contrastText,
-                            marginBottom: "16px",
-                            padding: "16px",
+                            marginBottom: "14px",
+                            padding: "0 14px 14px",
                             borderRadius: "8px",
                             boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                             width: isNonMobile ? "calc(50% - 16px)" : "100%",
@@ -104,14 +104,23 @@ const Stations = () => {
                     >
                         <h2
                             style={{
-                                fontSize: "24px",
-                                marginBottom: "8px",
+                                fontSize: "27px",
+                                marginBottom: "4px",
+                                fontFamily: "Arial, sans-serif",
+                                fontWeight: "bold",
+                                textTransform: "uppercase",
                             }}
                         >
                             {station.name}
                         </h2>
 
-                        <p style={{ marginBottom: "4px" }}>
+                        <p
+                            style={{
+                                marginBottom: "4px",
+                                fontFamily: "Arial, sans-serif",
+                                fontSize: "14px",
+                            }}
+                        >
                             {station.surface === "underground" ? (
                                 <>
                                     <b>Surface:</b> {station.surface} 🌑
@@ -123,19 +132,43 @@ const Stations = () => {
                             )}
                         </p>
                         {station.connections && (
-                            <p style={{ marginBottom: "4px" }}>
+                            <p
+                                style={{
+                                    marginBottom: "4px",
+                                    fontFamily: "Arial, sans-serif",
+                                    fontSize: "14px",
+                                }}
+                            >
                                 <b>Connections:</b>{" "}
                                 {station.connections.map((connectionId) => {
                                     const connectedStation = stations.find(
                                         (station) =>
                                             station._id === connectionId
                                     );
-                                    return connectedStation
-                                        ? `${connectedStation.name}, `
-                                        : "";
+                                    return connectedStation ? (
+                                        <span
+                                            key={connectionId}
+                                            style={{
+                                                marginLeft: "4px",
+                                                marginRight: "4px",
+                                                fontStyle: "italic",
+                                            }}
+                                        >
+                                            {connectedStation.name}
+                                        </span>
+                                    ) : null;
                                 })}
                             </p>
                         )}
+                        <p
+                            style={{
+                                marginBottom: "4px",
+                                fontFamily: "Arial, sans-seriff",
+                                fontSize: "14px",
+                            }}
+                        >
+                            <b>InfoBoard:</b> {infoBoardContents[station._id]}
+                        </p>
                     </Box>
                 ))}
             </Box>
