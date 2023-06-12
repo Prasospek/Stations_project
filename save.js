@@ -22,9 +22,27 @@ const Stations = () => {
             try {
                 const response = await fetch("http://localhost:8001/stations");
                 const data = await response.json();
-                setStations(data);
+
+                // Fetch connections for each station
+                const stationPromises = data.map(async (station) => {
+                    const connectionsResponse = await fetch(
+                        `http://localhost:8001/stations/${station._id}/connections`
+                    );
+                    const connectionsData = await connectionsResponse.json();
+
+                    return {
+                        ...station,
+                        connections: connectionsData.connections,
+                    };
+                });
+
+                const stationsWithConnections = await Promise.all(
+                    stationPromises
+                );
+
+                setStations(stationsWithConnections);
                 setLoading(false);
-                console.log("HAHAHAHA", data);
+                console.log(stationsWithConnections);
             } catch (error) {
                 console.error("Error fetching stations:", error);
                 setError("Failed to fetch stations");
@@ -41,7 +59,6 @@ const Stations = () => {
                 `http://localhost:8001/info-boards/${infoBoardId}`
             );
             const data = await response.json();
-
             return data.content;
         } catch (error) {
             console.error("Error fetching InfoBoard content:", error);
@@ -70,18 +87,33 @@ const Stations = () => {
         fetchAllInfoBoardContents();
     }, [stations]);
 
-    const fetchStations = async () => {
+    const fetchConnections = async () => {
         try {
-            const response = await fetch("http://localhost:8001/stations");
-            const data = response.json();
+            const response = await fetch("http://localhost:8001/connections");
+            const data = await response.json();
+            const connectionsMap = {};
 
-            //const stationsWithConnectiosn = await Station;
+            // Create a map of connections using station IDs as keys
+            data.forEach((connection) => {
+                if (!connectionsMap[connection.stationId]) {
+                    connectionsMap[connection.stationId] = [];
+                }
+                connectionsMap[connection.stationId].push(
+                    connection.connectionId
+                );
+            });
+
+            setConnections(connectionsMap);
         } catch (error) {
-            console.error("Error fetching stations:", error);
-            setError("Failed to fetch stations");
-            setLoading(false);
+            console.error("Error fetching connections:", error);
         }
     };
+
+    const [connections, setConnections] = useState({});
+
+    useEffect(() => {
+        fetchConnections();
+    }, []);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -136,7 +168,23 @@ const Stations = () => {
                             )}
                         </p>
                         <p style={{ marginBottom: "4px" }}>
-                            <b>Connections:</b> {station.connections}
+                            <b>Connections:</b>{" "}
+                            {connections[station._id] &&
+                            Array.isArray(connections[station._id]) ? (
+                                connections[station._id].map(
+                                    (connection, i) => (
+                                        <span key={i}>
+                                            {connection}
+                                            {i !==
+                                            connections[station._id].length - 1
+                                                ? ", "
+                                                : ""}
+                                        </span>
+                                    )
+                                )
+                            ) : (
+                                <span>No Connections available!</span>
+                            )}
                         </p>
                         <p style={{ marginBottom: "4px" }}>
                             <b>Info Board: </b>
