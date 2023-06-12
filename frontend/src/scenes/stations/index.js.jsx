@@ -123,7 +123,15 @@ const Stations = () => {
                             )}
                         </p>
                         <p style={{ marginBottom: "4px" }}>
-                            <b>Connections:</b> {station.connections}
+                            <b>Connections:</b>{" "}
+                            {station.connections.map((connectId) => {
+                                const connectedStation = stations.find(
+                                    (station) => station._id === connectId
+                                );
+                                return connectedStation
+                                    ? `${connectedStation.name}, `
+                                    : "";
+                            })}
                         </p>
                         <p style={{ marginBottom: "4px" }}>
                             <b>Info Board: </b>
