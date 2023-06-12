@@ -24,6 +24,10 @@ const HomePage = () => {
         navigate(`/users/${user._id}/tickets`);
     };
 
+    const handleBuyTicket = () => {
+        navigate(`/tickets`);
+    };
+
     const handleDisplayRoutes = () => {
         setShowModal(true);
     };
@@ -51,6 +55,7 @@ const HomePage = () => {
                     borderRadius="5px"
                     boxShadow="0 2px 5px rgba(0, 0, 0, 0.1)"
                     style={{ cursor: "pointer" }}
+                    onClick={() => handleBuyTicket()}
                 >
                     <h2>Buy ticket</h2>
                 </Box>

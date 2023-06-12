@@ -4,7 +4,6 @@ import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Footer from "../footer/footer";
-import Station from "../../../backend/models/Station";
 
 const Stations = () => {
     const { palette } = useTheme();
@@ -75,7 +74,7 @@ const Stations = () => {
             const response = await fetch("http://localhost:8001/stations");
             const data = response.json();
 
-            const stationsWithConnectiosn = await Station;
+            //const stationsWithConnectiosn = await Station;
         } catch (error) {
             console.error("Error fetching stations:", error);
             setError("Failed to fetch stations");
