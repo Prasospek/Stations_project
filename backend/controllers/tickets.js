@@ -49,6 +49,12 @@ export const createTicket = async (req, res) => {
 
         await newTicket.save();
 
+        // Update the user's tickets array with the new ticket's ID
+
+        const user = await User.findOneAndUpdate(passenger_id, {
+            $push: { tickets: newTicket._id },
+        });
+
         res.status(201).json(newTicket);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -92,7 +98,6 @@ export const deleteTicket = async (req, res) => {
             return res.status(404).json({ error: "Ticket not found !" });
         }
 
-        
         // Remove the reference to the deleted ticket from the user's tickets array
         const user = await User.findOneAndUpdate(
             { tickets: id },
