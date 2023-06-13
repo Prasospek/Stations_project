@@ -4,7 +4,6 @@ const initialState = {
     user: null,
     token: null,
     mode: "light",
-    // MAJI TU BYT TICKETS ? + DODELAT REDUCER
     tickets: [],
 };
 
