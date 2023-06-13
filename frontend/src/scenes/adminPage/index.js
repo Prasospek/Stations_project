@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, useTheme, IconButton, useMediaQuery } from "@mui/material";
+import {
+    Box,
+    useTheme,
+    IconButton,
+    useMediaQuery,
+    Typography,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -54,15 +60,90 @@ const AdminPage = () => {
         }
     };
 
+    const [editedUser, setEditedUser] = useState(null);
+
     const handleUpdateUser = (userId) => {
-        // Handle update user logic here
-        // You can navigate to a separate update user page or show a modal for editing
-        console.log(`Updating user with ID: ${userId}`);
+        const selected = users.find((user) => user._id === userId);
+        setEditedUser(selected);
+    };
+
+    const handleCancelEdit = () => {
+        setEditedUser(null);
+    };
+
+    const handleSaveUser = async () => {
+        try {
+            // Make an API call to update the user details in the server
+            await axios.put(
+                `http://localhost:8001/users/${editedUser._id}`,
+                editedUser
+            );
+            // Update the users state with the updated user details
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user._id === editedUser._id ? editedUser : user
+                )
+            );
+            toast.success(
+                `${editedUser.firstName} ${editedUser.lastName} updated successfully!`
+            );
+            setEditedUser(null); // Reset the edited user state
+        } catch (error) {
+            console.error("Error updating user:", error);
+            toast.error("Error, there was a mistake!");
+        }
     };
 
     return (
         <div>
             <ToastContainer />
+            {editedUser && (
+                <div>
+                    <input
+                        type="text"
+                        value={editedUser.firstName}
+                        onChange={(e) =>
+                            setEditedUser({
+                                ...editedUser,
+                                firstName: e.target.value,
+                            })
+                        }
+                    />
+                    <input
+                        type="text"
+                        value={editedUser.lastName}
+                        onChange={(e) =>
+                            setEditedUser({
+                                ...editedUser,
+                                lastName: e.target.value,
+                            })
+                        }
+                    />
+                    <input
+                        type="email"
+                        value={editedUser.email}
+                        onChange={(e) =>
+                            setEditedUser({
+                                ...editedUser,
+                                email: e.target.value,
+                            })
+                        }
+                    />
+                    <input
+                        type="password"
+                        value={editedUser.password}
+                        onChange={(e) =>
+                            setEditedUser({
+                                ...editedUser,
+                                password: e.target.value,
+                            })
+                        }
+                    />
+                    <button onClick={handleSaveUser}>Save</button>
+                    <button onClick={handleCancelEdit}>Cancel</button>
+                </div>
+            )}
+
             <div
                 style={{
                     display: "flex",
@@ -85,14 +166,45 @@ const AdminPage = () => {
                         width={isMobile ? "100%" : "48%"}
                         position="relative"
                         marginTop="1rem"
+                        overflow="hidden"
                     >
                         <div>
-                            <h3>{`${user.firstName} ${user.lastName}`}</h3>
-                            <p>Email: {user.email}</p>
-                            <p style={{ wordBreak: "break-word" }}>
-                                Password: {user.password}
-                            </p>
-                            <p>Role: {user.role}</p>
+                            <Typography
+                                variant="h4"
+                                gutterBottom
+                                sx={{ fontSize: "1.7rem" }}
+                            >
+                                {`${user.firstName} ${user.lastName}`}
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                gutterBottom
+                                sx={{ fontSize: "0.9rem" }}
+                            >
+                                <strong>First Name:</strong> {user.firstName}
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                gutterBottom
+                                sx={{ fontSize: "0.9rem" }}
+                            >
+                                <strong>Last Name:</strong> {user.lastName}
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                gutterBottom
+                                sx={{ fontSize: "0.9rem" }}
+                            >
+                                <strong>Email:</strong> {user.email}
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                gutterBottom
+                                sx={{ fontSize: "0.9rem" }}
+                                style={{ wordBreak: "break-word" }}
+                            >
+                                <strong>Password:</strong> {user.password}
+                            </Typography>
                         </div>
                         <div>
                             <IconButton
