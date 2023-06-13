@@ -6,18 +6,18 @@
 
 .roll-content {
     display: flex;
-    animation: roll 20s linear infinite;
+    animation: roll 60s linear infinite;
 }
 
 .roll-content img {
-    width: auto;
-    height: 100%;
+    width: 100%;
+    height: auto;
     margin-right: 10px;
 }
 
 @keyframes roll {
     0% {
-        transform: translateX(0);
+        transform: translateX(0%);
     }
     100% {
         transform: translateX(-100%);

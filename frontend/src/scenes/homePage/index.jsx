@@ -172,7 +172,22 @@ const HomePage = () => {
                         />
                         <img
                             src={`${process.env.PUBLIC_URL}/assets/picture6.jpg`}
-                            alt="Credit 5"
+                            alt="Credit 6"
+                            style={{ width: "auto", height: "100%" }}
+                        />
+                        <img
+                            src={`${process.env.PUBLIC_URL}/assets/picture7.jpg`}
+                            alt="Credit 7"
+                            style={{ width: "auto", height: "100%" }}
+                        />
+                        <img
+                            src={`${process.env.PUBLIC_URL}/assets/picture8.jpg`}
+                            alt="Credit 8"
+                            style={{ width: "auto", height: "100%" }}
+                        />
+                        <img
+                            src={`${process.env.PUBLIC_URL}/assets/picture9.jpg`}
+                            alt="Credit 9"
                             style={{ width: "auto", height: "100%" }}
                         />
                     </div>
