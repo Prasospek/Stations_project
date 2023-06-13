@@ -6,7 +6,6 @@ import {
     useMediaQuery,
     Typography,
     Button,
-    TextField,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -15,8 +14,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Formik, Field } from "formik";
-import * as yup from "yup";
 
 const AdminPage = () => {
     const { palette } = useTheme();
@@ -29,33 +26,9 @@ const AdminPage = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedUser, setEditedUser] = useState({});
 
-    /* FORMIK YUP */
-
-    const registerSchema = yup.object().shape({
-        firstName: yup
-            .string()
-            .min(2, "Password must be at least 2 characters a-Z0-9")
-            .required("required and must be at least 2 characters a-Z0-9"),
-        lastName: yup
-            .string()
-            .min(2, "Password must be at least 2 characters a-Z0-9")
-            .required("required and must be at least 2 characters a-Z0-9"),
-        email: yup
-            .string()
-            .email("Email must contain @ followed by .com .cz etc")
-            .required("required"),
-        password: yup
-            .string()
-            .min(5, "Password must be at least 5 characters")
-            .required("required"),
-    });
-
     const fetchUsers = async () => {
         try {
-            //const response = await axios.get("http://localhost:8001/users");
-            const response = await axios.get(
-                "http://localhost:8001/users?_embed=tickets"
-            );
+            const response = await axios.get("http://localhost:8001/users");
             const data = response.data;
             setUsers(data);
         } catch (error) {
@@ -93,7 +66,7 @@ const AdminPage = () => {
         setEditedUser(user);
     };
 
-    const handleSaveChanges = async (values) => {
+    const handleSaveChanges = async () => {
         try {
             const confirmed = window.confirm(
                 "Do you want to save the changes you made?"
@@ -102,16 +75,15 @@ const AdminPage = () => {
             if (confirmed) {
                 await axios.put(
                     `http://localhost:8001/users/${editedUser._id}`,
-                    values
+                    editedUser
                 );
                 // Update the user in the users state
                 setUsers((prevUsers) =>
                     prevUsers.map((user) =>
-                        user._id === editedUser._id ? values : user
+                        user._id === editedUser._id ? editedUser : user
                     )
                 );
                 setIsEditing(false);
-                setEditedUser({});
                 toast.success("Changes saved successfully!");
             }
         } catch (error) {
@@ -148,122 +120,89 @@ const AdminPage = () => {
                         display="flex"
                         alignItems="center"
                         justifyContent="space-between"
-                        borderRadius="7px"
-                        width={isMobile ? "100%" : "49%"}
+                        borderRadius="4px"
+                        width={isMobile ? "100%" : "45%"}
                     >
                         {isEditing && editedUser._id === user._id ? (
                             <div>
                                 <Typography variant="h6">
                                     Editing User:
                                 </Typography>
-                                <Formik
-                                    initialValues={{
-                                        firstName: editedUser.firstName,
-                                        lastName: editedUser.lastName,
-                                        email: editedUser.email,
-                                        password: editedUser.password,
-                                    }}
-                                    validationSchema={registerSchema}
-                                    onSubmit={handleSaveChanges}
-                                >
-                                    {({ handleSubmit, errors, touched }) => (
-                                        <form onSubmit={handleSubmit}>
-                                            <Box marginTop="1rem">
-                                                <Typography variant="body1">
-                                                    First Name:
-                                                </Typography>
-                                                <Field
-                                                    type="text"
-                                                    name="firstName"
-                                                    as={TextField}
-                                                    error={
-                                                        errors.firstName &&
-                                                        touched.firstName
-                                                    }
-                                                    helperText={
-                                                        errors.firstName &&
-                                                        touched.firstName &&
-                                                        errors.firstName
-                                                    }
-                                                />
-                                            </Box>
-                                            <Box marginTop="1rem">
-                                                <Typography variant="body1">
-                                                    Last Name:
-                                                </Typography>
-                                                <Field
-                                                    type="text"
-                                                    name="lastName"
-                                                    as={TextField}
-                                                    error={
-                                                        errors.lastName &&
-                                                        touched.lastName
-                                                    }
-                                                    helperText={
-                                                        errors.lastName &&
-                                                        touched.lastName &&
-                                                        errors.lastName
-                                                    }
-                                                />
-                                            </Box>
-                                            <Box marginTop="1rem">
-                                                <Typography variant="body1">
-                                                    Email:
-                                                </Typography>
-                                                <Field
-                                                    type="email"
-                                                    name="email"
-                                                    as={TextField}
-                                                    error={
-                                                        errors.email &&
-                                                        touched.email
-                                                    }
-                                                    helperText={
-                                                        errors.email &&
-                                                        touched.email &&
-                                                        errors.email
-                                                    }
-                                                />
-                                            </Box>
-                                            <Box marginTop="1rem">
-                                                <Typography variant="body1">
-                                                    Password:
-                                                </Typography>
-                                                <Field
-                                                    type="password"
-                                                    name="password"
-                                                    as={TextField}
-                                                    error={
-                                                        errors.password &&
-                                                        touched.password
-                                                    }
-                                                    helperText={
-                                                        errors.password &&
-                                                        touched.password &&
-                                                        errors.password
-                                                    }
-                                                />
-                                            </Box>
-                                            <Box
-                                                marginTop="1rem"
-                                                display="flex"
-                                            >
-                                                <Button
-                                                    type="submit"
-                                                    variant="contained"
-                                                >
-                                                    Save
-                                                </Button>
-                                                <Button
-                                                    variant="contained"
-                                                    onClick={handleCancelEdit}
-                                                >
-                                                    Cancel
-                                                </Button>
-                                            </Box>
-                                        </form>
-                                    )}
-                                </Formik>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        First Name:
+                                    </Typography>
+                                    <input
+                                        type="text"
+                                        value={editedUser.firstName}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                firstName: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Last Name:
+                                    </Typography>
+                                    <input
+                                        type="text"
+                                        value={editedUser.lastName}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                lastName: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Email:
+                                    </Typography>
+                                    <input
+                                        type="email"
+                                        value={editedUser.email}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                email: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Password:
+                                    </Typography>
+                                    <input
+                                        type="password"
+                                        value={editedUser.password}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                password: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem" display="flex">
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleSaveChanges}
+                                        sx={{ marginRight: "1rem" }}
+                                    >
+                                        Save
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleCancelEdit}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Box>
                             </div>
                         ) : (
                             <div>
@@ -296,22 +235,36 @@ const AdminPage = () => {
                                 >
                                     <strong>Email:</strong> {user.email}
                                 </Typography>
-                                <Box marginTop="1rem">
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    style={{ wordBreak: "break-word" }}
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Password:</strong> {user.password}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Role:</strong> {user.role}
+                                </Typography>
+
+                                <Box marginTop="1rem" display="flex">
                                     <IconButton
                                         color="inherit"
-                                        aria-label="Edit User"
-                                        onClick={() => handleUpdateUser(user)}
-                                    >
-                                        <EditIcon />
-                                    </IconButton>
-                                    <IconButton
-                                        color="inherit"
-                                        aria-label="Delete User"
                                         onClick={() =>
                                             handleRemoveUser(user._id)
                                         }
                                     >
                                         <DeleteIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        color="inherit"
+                                        onClick={() => handleUpdateUser(user)}
+                                    >
+                                        <EditIcon />
                                     </IconButton>
                                 </Box>
                             </div>
