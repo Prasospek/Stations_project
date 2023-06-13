@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { TextField, Button, Select, MenuItem } from "@mui/material";
-import { useSelector } from "react-redux";
+import {
+    TextField,
+    Button,
+    Select,
+    MenuItem,
+    Box,
+    useMediaQuery,
+    Typography,
+    useTheme,
+} from "@mui/material";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { Formik } from "formik";
+import * as yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CreateTicketForm = () => {
     const [purchaseMethod, setPurchaseMethod] = useState("");
@@ -62,16 +77,19 @@ const CreateTicketForm = () => {
                     </MenuItem>
                 ))}
             </Select>
-            <TextField
+            <Select
                 label="Purchase Method"
                 name="purchase_method"
                 value={purchaseMethod}
                 onChange={(e) => setPurchaseMethod(e.target.value)}
                 required
                 fullWidth
-            />
+            >
+                <MenuItem value="Online">Online</MenuItem>
+                <MenuItem value="Station">Station</MenuItem>
+            </Select>
             <Select
-                label="Destination ID"
+                label="Destination"
                 name="destination_id"
                 value={destinationId}
                 onChange={(e) => setDestinationId(e.target.value)}
