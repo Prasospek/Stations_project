@@ -16,6 +16,7 @@ import * as yup from "yup";
 import { useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const ticketSchema = yup.object().shape({
     station_id: yup
@@ -47,6 +48,7 @@ const CreateTicketForm = () => {
 
     const [stations, setStations] = useState([]);
     const userId = useSelector((state) => state.user._id);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchStations();
@@ -76,6 +78,7 @@ const CreateTicketForm = () => {
             resetForm();
 
             toast.success("Ticket created successfully");
+            navigate("/home");
         } catch (error) {
             console.error("Error creating ticket:", error.message);
             toast.error("Error creating ticket");
@@ -110,18 +113,7 @@ const CreateTicketForm = () => {
                             isSubmitting,
                         }) => (
                             <form onSubmit={handleSubmit}>
-                                <Box
-                                    display="grid"
-                                    gap="30px"
-                                    gridTemplateColumns="repeat(2, minmax(0, 1fr))"
-                                    sx={{
-                                        "& > div": {
-                                            gridColumn: isNonMobile
-                                                ? undefined
-                                                : "span 2",
-                                        },
-                                    }}
-                                >
+                                <Box display="grid" gap="30px">
                                     <Select
                                         label="Station"
                                         name="station_id"
@@ -134,6 +126,11 @@ const CreateTicketForm = () => {
                                         }
                                         required
                                         fullWidth
+                                        sx={{
+                                            gridColumn: isNonMobile
+                                                ? undefined
+                                                : "span 2",
+                                        }}
                                     >
                                         {stations.map((station) => (
                                             <MenuItem
@@ -157,6 +154,11 @@ const CreateTicketForm = () => {
                                         }
                                         required
                                         fullWidth
+                                        sx={{
+                                            gridColumn: isNonMobile
+                                                ? undefined
+                                                : "span 2",
+                                        }}
                                     >
                                         <MenuItem value="Online">
                                             Online
@@ -178,6 +180,11 @@ const CreateTicketForm = () => {
                                         }
                                         required
                                         fullWidth
+                                        sx={{
+                                            gridColumn: isNonMobile
+                                                ? undefined
+                                                : "span 2",
+                                        }}
                                     >
                                         {stations.map((station) => (
                                             <MenuItem
