@@ -1,233 +1,233 @@
-import React, { useState, useEffect } from "react";
-import Navbar from "../navbar";
-import Footer from "../footer/footer";
+import React, { useEffect, useState } from "react";
 import {
     Box,
-    Button,
-    TextField,
-    useMediaQuery,
     useTheme,
-    MenuItem,
+    IconButton,
+    useMediaQuery,
+    Typography,
+    Button,
 } from "@mui/material";
-import { Formik } from "formik";
-import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { setTickets } from "../../state";
-
+import { useNavigate } from "react-router-dom";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const stations = {
-    Station1: "6485f933e63353dd9f5c4a85",
-    Station2: "6485f944e63353dd9f5c4a87",
-    Station3: "6485f948e63353dd9f5c4a89",
-    Station4: "6485f94ce63353dd9f5c4a8b",
-    Station5: "6485f94fe63353dd9f5c4a8d",
-    Station6: "6485f951e63353dd9f5c4a8f",
-    Station7: "6485f956e63353dd9f5c4a91",
-};
-
-const ticketSchema = yup.object().shape({
-    station_id: yup
-        .string()
-        .oneOf(Object.keys(stations), "Invalid Starter Station")
-        .required("Starter Station is required"),
-    purchase_method: yup
-        .string()
-        .oneOf(
-            ["station", "online"],
-            "Purchase Method must be either 'station' or 'online'"
-        )
-        .required("Purchase Method is required"),
-    destination_id: yup
-        .string()
-        .oneOf(Object.keys(stations), "Invalid Destination Station")
-        .required("Destination Station is required"),
-});
-
-const initialValues = {
-    station_id: "",
-    station_name: "",
-    purchase_method: "",
-    destination_id: "",
-    destination_name: "",
-};
-
-const CreateTicket = () => {
+const AdminPage = () => {
     const { palette } = useTheme();
     const dispatch = useDispatch();
-    const isNonMobile = useMediaQuery("(min-width:800px)");
+    const navigate = useNavigate();
+    const user = useSelector((state) => state.user);
+    const isMobile = useMediaQuery("(max-width:800px)");
 
-    const user = useSelector((state) => state.user._id);
+    const [users, setUsers] = useState([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedUser, setEditedUser] = useState({});
 
-    const createTicketHandle = async (values, onSubmitProps) => {
+    const fetchUsers = async () => {
         try {
-            const stationId = stations[values.station_id]; // Get the corresponding ID from the stations object
-            const destinationId = stations[values.destination_id]; // Get the corresponding ID from the stations object
-
-            const payload = {
-                ...values,
-                station_id: stationId,
-                destination_id: destinationId,
-            };
-
-            const createTicketResponse = await fetch(
-                "http://localhost:8001/tickets",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
-                }
-            );
-
-            if (createTicketResponse.ok) {
-                // Ticket created successfully
-                const newTicket = await createTicketResponse.json();
-                dispatch(setTickets([...user.tickets, newTicket])); // Update the tickets array in the Redux store
-                toast.success("Ticket created successfully!");
-                onSubmitProps.resetForm();
-            } else {
-                // Error occurred while creating ticket
-                const errorData = await createTicketResponse.json();
-                toast.error(errorData.message);
-            }
+            const response = await axios.get("http://localhost:8001/users");
+            const data = response.data;
+            setUsers(data);
         } catch (error) {
-            console.error("Error creating ticket:", error);
-            toast.error("An error occurred while creating the ticket.");
+            console.error("Error fetching users:", error);
         }
     };
 
-    const handleFormSubmit = async (values, onSubmitProps) => {
-        createTicketHandle(values, onSubmitProps); // Pass the values to createTicketHandle function
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const handleRemoveUser = async (userId) => {
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this user?"
+        );
+
+        if (confirmed) {
+            try {
+                await axios.delete(`http://localhost:8001/users/${userId}`);
+                // Remove the deleted user from the users state
+                setUsers((prevUsers) =>
+                    prevUsers.filter((user) => user._id !== userId)
+                );
+                console.log(`Removing user with ID: ${userId}`);
+                toast.success(
+                    `${user.firstName} ${user.lastName} deleted successfully!`
+                );
+            } catch (error) {
+                console.error("Error removing user:", error);
+                toast.error("Error, there was a mistake!");
+            }
+        }
+    };
+
+    const handleUpdateUser = (user) => {
+        setIsEditing(true);
+        setEditedUser(user);
+    };
+
+    const handleSaveChanges = async () => {
+        try {
+            await axios.put(
+                `http://localhost:8001/users/${editedUser._id}`,
+                editedUser
+            );
+            // Update the user in the users state
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user._id === editedUser._id ? editedUser : user
+                )
+            );
+            setIsEditing(false);
+            toast.success("Changes saved successfully!");
+        } catch (error) {
+            console.error("Error saving changes:", error);
+            toast.error("Error, there was a mistake!");
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditedUser({});
     };
 
     return (
         <div>
-            <Navbar />
-
-            <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                height="80vh"
+            <ToastContainer />
+            <div
+                style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "space-between",
+                    marginLeft: "3rem",
+                    marginRight: "3rem",
+                    marginTop: "2rem",
+                }}
             >
-                <Box width="70%">
-                    <h2>Buy Ticket</h2>
-
-                    <Formik
-                        onSubmit={handleFormSubmit}
-                        initialValues={initialValues}
-                        validationSchema={ticketSchema}
+                {users.map((user) => (
+                    <Box
+                        key={user._id}
+                        bgcolor={palette.primary.main}
+                        color={palette.background.alt}
+                        padding="1rem"
+                        marginBottom="1rem"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        borderRadius="4px"
+                        width={isMobile ? "100%" : "45%"}
                     >
-                        {({
-                            values,
-                            errors,
-                            touched,
-                            handleBlur,
-                            handleChange,
-                            handleSubmit,
-                            setFieldValue,
-                            resetForm,
-                        }) => (
-                            <form onSubmit={handleSubmit}>
-                                <Box
-                                    display="grid"
-                                    gap="30px"
-                                    gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-                                    sx={{
-                                        "& > div": {
-                                            gridColumn: isNonMobile
-                                                ? undefined
-                                                : "span 4",
-                                        },
-                                    }}
-                                >
-                                    <TextField
-                                        label="Starter Station"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        value={values.station_id}
-                                        name="station_id"
-                                        error={
-                                            Boolean(touched.station_id) &&
-                                            Boolean(errors.station_id)
+                        {isEditing && editedUser._id === user._id ? (
+                            <div>
+                                <Typography variant="h6">
+                                    Editing User:
+                                </Typography>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        First Name:
+                                    </Typography>
+                                    <input
+                                        type="text"
+                                        value={editedUser.firstName}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                firstName: e.target.value,
+                                            })
                                         }
-                                        helperText={
-                                            touched.station_id &&
-                                            errors.station_id
-                                        }
-                                        sx={{ gridColumn: "span 4" }}
                                     />
-
-                                    <TextField
-                                        label="Destination Station"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        value={values.destination_id}
-                                        name="destination_id"
-                                        error={
-                                            Boolean(touched.destination_id) &&
-                                            Boolean(errors.destination_id)
-                                        }
-                                        helperText={
-                                            touched.destination_id &&
-                                            errors.destination_id
-                                        }
-                                        sx={{ gridColumn: "span 4" }}
-                                    />
-
-                                    <TextField
-                                        label="Purchase Method"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        value={values.purchase_method}
-                                        name="purchase_method"
-                                        select
-                                        error={
-                                            Boolean(touched.purchase_method) &&
-                                            Boolean(errors.purchase_method)
-                                        }
-                                        helperText={
-                                            touched.purchase_method &&
-                                            errors.purchase_method
-                                        }
-                                        sx={{ gridColumn: "span 4" }}
-                                    >
-                                        <MenuItem value="station">
-                                            Station
-                                        </MenuItem>
-                                        <MenuItem value="online">
-                                            Online
-                                        </MenuItem>
-                                    </TextField>
                                 </Box>
-
-                                <Button
-                                    fullWidth
-                                    type="submit"
-                                    sx={{
-                                        m: "2rem 0",
-                                        p: "1rem",
-                                        backgroundColor: palette.primary.main,
-                                        color: palette.background.alt,
-                                        "&:hover": {
-                                            color: palette.primary.main,
-                                        },
-                                    }}
-                                >
-                                    Create Ticket
-                                </Button>
-
-                                <ToastContainer />
-                            </form>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Last Name:
+                                    </Typography>
+                                    <input
+                                        type="text"
+                                        value={editedUser.lastName}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                lastName: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Email:
+                                    </Typography>
+                                    <input
+                                        type="email"
+                                        value={editedUser.email}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                email: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Password:
+                                    </Typography>
+                                    <input
+                                        type="password"
+                                        value={editedUser.password}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                password: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem" display="flex">
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleSaveChanges}
+                                        sx={{ marginRight: "1rem" }}
+                                    >
+                                        Save
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleCancelEdit}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Box>
+                            </div>
+                        ) : (
+                            <div>
+                                <Typography variant="h6">{`${user.firstName} ${user.lastName}`}</Typography>
+                                <Typography variant="body1">{`Email: ${user.email}`}</Typography>
+                                <Typography variant="body1">{`Password: ${user.password}`}</Typography>
+                                <Box marginTop="1rem" display="flex">
+                                    <IconButton
+                                        color="inherit"
+                                        onClick={() =>
+                                            handleRemoveUser(user._id)
+                                        }
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        color="inherit"
+                                        onClick={() => handleUpdateUser(user)}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                </Box>
+                            </div>
                         )}
-                    </Formik>
-                </Box>
-            </Box>
-
-            <Footer />
+                    </Box>
+                ))}
+            </div>
         </div>
     );
 };
 
-export default CreateTicket;
+export default AdminPage;

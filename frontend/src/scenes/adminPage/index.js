@@ -5,6 +5,7 @@ import {
     IconButton,
     useMediaQuery,
     Typography,
+    Button,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +23,8 @@ const AdminPage = () => {
     const isMobile = useMediaQuery("(max-width:800px)");
 
     const [users, setUsers] = useState([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedUser, setEditedUser] = useState({});
 
     const fetchUsers = async () => {
         try {
@@ -60,90 +63,45 @@ const AdminPage = () => {
         }
     };
 
-    const [editedUser, setEditedUser] = useState(null);
+    const handleUpdateUser = (user) => {
+        setIsEditing(true);
+        setEditedUser(user);
+    };
 
-    const handleUpdateUser = (userId) => {
-        const selected = users.find((user) => user._id === userId);
-        setEditedUser(selected);
+    const handleSaveChanges = async () => {
+        try {
+            const confirmed = window.confirm(
+                "Do you want to save the changes you made?"
+            );
+
+            if (confirmed) {
+                await axios.put(
+                    `http://localhost:8001/users/${editedUser._id}`,
+                    editedUser
+                );
+                // Update the user in the users state
+                setUsers((prevUsers) =>
+                    prevUsers.map((user) =>
+                        user._id === editedUser._id ? editedUser : user
+                    )
+                );
+                setIsEditing(false);
+                toast.success("Changes saved successfully!");
+            }
+        } catch (error) {
+            console.error("Error saving changes:", error);
+            toast.error("Error, there was a mistake!");
+        }
     };
 
     const handleCancelEdit = () => {
-        setEditedUser(null);
-    };
-
-    const handleSaveUser = async () => {
-        try {
-            // Make an API call to update the user details in the server
-            await axios.put(
-                `http://localhost:8001/users/${editedUser._id}`,
-                editedUser
-            );
-            // Update the users state with the updated user details
-            setUsers((prevUsers) =>
-                prevUsers.map((user) =>
-                    user._id === editedUser._id ? editedUser : user
-                )
-            );
-            toast.success(
-                `${editedUser.firstName} ${editedUser.lastName} updated successfully!`
-            );
-            setEditedUser(null); // Reset the edited user state
-        } catch (error) {
-            console.error("Error updating user:", error);
-            toast.error("Error, there was a mistake!");
-        }
+        setIsEditing(false);
+        setEditedUser({});
     };
 
     return (
         <div>
             <ToastContainer />
-            {editedUser && (
-                <div>
-                    <input
-                        type="text"
-                        value={editedUser.firstName}
-                        onChange={(e) =>
-                            setEditedUser({
-                                ...editedUser,
-                                firstName: e.target.value,
-                            })
-                        }
-                    />
-                    <input
-                        type="text"
-                        value={editedUser.lastName}
-                        onChange={(e) =>
-                            setEditedUser({
-                                ...editedUser,
-                                lastName: e.target.value,
-                            })
-                        }
-                    />
-                    <input
-                        type="email"
-                        value={editedUser.email}
-                        onChange={(e) =>
-                            setEditedUser({
-                                ...editedUser,
-                                email: e.target.value,
-                            })
-                        }
-                    />
-                    <input
-                        type="password"
-                        value={editedUser.password}
-                        onChange={(e) =>
-                            setEditedUser({
-                                ...editedUser,
-                                password: e.target.value,
-                            })
-                        }
-                    />
-                    <button onClick={handleSaveUser}>Save</button>
-                    <button onClick={handleCancelEdit}>Cancel</button>
-                </div>
-            )}
-
             <div
                 style={{
                     display: "flex",
@@ -161,75 +119,121 @@ const AdminPage = () => {
                         color={palette.background.alt}
                         padding="1rem"
                         marginBottom="1rem"
-                        borderRadius="5px"
-                        boxShadow="0 2px 5px rgba(0, 0, 0, 0.1)"
-                        width={isMobile ? "100%" : "48%"}
-                        position="relative"
-                        marginTop="1rem"
-                        overflow="hidden"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        borderRadius="4px"
+                        width={isMobile ? "100%" : "45%"}
                     >
-                        <div>
-                            <Typography
-                                variant="h4"
-                                gutterBottom
-                                sx={{ fontSize: "1.7rem" }}
-                            >
-                                {`${user.firstName} ${user.lastName}`}
-                            </Typography>
-                            <Typography
-                                variant="body1"
-                                gutterBottom
-                                sx={{ fontSize: "0.9rem" }}
-                            >
-                                <strong>First Name:</strong> {user.firstName}
-                            </Typography>
-                            <Typography
-                                variant="body1"
-                                gutterBottom
-                                sx={{ fontSize: "0.9rem" }}
-                            >
-                                <strong>Last Name:</strong> {user.lastName}
-                            </Typography>
-                            <Typography
-                                variant="body1"
-                                gutterBottom
-                                sx={{ fontSize: "0.9rem" }}
-                            >
-                                <strong>Email:</strong> {user.email}
-                            </Typography>
-                            <Typography
-                                variant="body1"
-                                gutterBottom
-                                sx={{ fontSize: "0.9rem" }}
-                                style={{ wordBreak: "break-word" }}
-                            >
-                                <strong>Password:</strong> {user.password}
-                            </Typography>
-                        </div>
-                        <div>
-                            <IconButton
-                                color="inherit"
-                                onClick={() => handleRemoveUser(user._id)}
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    right: 0,
-                                }}
-                            >
-                                <DeleteIcon />
-                            </IconButton>
-                            <IconButton
-                                color="inherit"
-                                onClick={() => handleUpdateUser(user._id)}
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    right: "2rem",
-                                }}
-                            >
-                                <EditIcon />
-                            </IconButton>
-                        </div>
+                        {isEditing && editedUser._id === user._id ? (
+                            <div>
+                                <Typography variant="h6">
+                                    Editing User:
+                                </Typography>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        First Name:
+                                    </Typography>
+                                    <input
+                                        type="text"
+                                        value={editedUser.firstName}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                firstName: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Last Name:
+                                    </Typography>
+                                    <input
+                                        type="text"
+                                        value={editedUser.lastName}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                lastName: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Email:
+                                    </Typography>
+                                    <input
+                                        type="email"
+                                        value={editedUser.email}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                email: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Password:
+                                    </Typography>
+                                    <input
+                                        type="password"
+                                        value={editedUser.password}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                password: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem" display="flex">
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleSaveChanges}
+                                        sx={{ marginRight: "1rem" }}
+                                    >
+                                        Save
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleCancelEdit}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Box>
+                            </div>
+                        ) : (
+                            <div>
+                                <Typography variant="h6">{`${user.firstName} ${user.lastName}`}</Typography>
+                                <Typography variant="h6">{`First name: ${user.firstName}`}</Typography>
+                                <Typography variant="h6">{`Last name: ${user.lastName}`}</Typography>
+                                <Typography variant="body1">{`Email: ${user.email}`}</Typography>
+                                <Typography
+                                    variant="body1"
+                                    style={{ wordBreak: "break-word" }}
+                                >{`Password: ${user.password}`}</Typography>
+                                <Box marginTop="1rem" display="flex">
+                                    <IconButton
+                                        color="inherit"
+                                        onClick={() =>
+                                            handleRemoveUser(user._id)
+                                        }
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        color="inherit"
+                                        onClick={() => handleUpdateUser(user)}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                </Box>
+                            </div>
+                        )}
                     </Box>
                 ))}
             </div>
