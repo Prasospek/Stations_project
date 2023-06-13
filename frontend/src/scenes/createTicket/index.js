@@ -1,91 +1,89 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import jwt_decode from "jwt-decode";
-import Navbar from "../navbar";
-import { Box, useMediaQuery, useTheme, TextField, Button } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import Footer from "../footer/footer";
+import { TextField, Button, Select, MenuItem } from "@mui/material";
+import { useSelector } from "react-redux";
 
 const CreateTicketForm = () => {
-    const { palette } = useTheme();
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const isNonMobile = useMediaQuery("(min-width:800px)");
-    const isSmallScreen = useMediaQuery("(max-width:600px)");
-
-    const [stationId, setStationId] = useState("");
     const [purchaseMethod, setPurchaseMethod] = useState("");
+    const [stationId, setStationId] = useState("");
     const [destinationId, setDestinationId] = useState("");
     const [stations, setStations] = useState([]);
 
-    const user = useSelector((state) => state.user._id);
+    const userId = useSelector((state) => state.user._id);
 
     useEffect(() => {
-        const fetchStations = async () => {
-            try {
-                const response = await axios.get("/api/stations");
-                setStations(response.data); // Assuming response.data is an array of station objects
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
         fetchStations();
     }, []);
+
+    const fetchStations = async () => {
+        try {
+            const response = await axios.get("http://localhost:8001/stations");
+            setStations(response.data);
+        } catch (error) {
+            console.error("Error fetching stations:", error.message);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const authToken = localStorage.getItem("authToken");
-        const decodedToken = jwt_decode(authToken);
-        const passengerId = decodedToken.sub;
-
         try {
-            const response = await axios.post(
-                "/api/tickets",
-                {
-                    station_id: stationId,
-                    purchase_method: purchaseMethod,
-                    destination_id: destinationId,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${authToken}`,
-                    },
-                }
-            );
+            const response = await axios.post("http://localhost:8001/tickets", {
+                passenger_id: userId,
+                station_id: stationId,
+                purchase_method: purchaseMethod,
+                destination_id: destinationId,
+            });
 
             console.log(response.data); // New ticket object
 
-            navigate.push("/tickets"); // Redirect to tickets page after successful ticket creation
+            // Reset form fields
+            setStationId("");
+            setPurchaseMethod("");
+            setDestinationId("");
         } catch (error) {
-            console.error(error);
+            console.error("Error creating ticket:", error.message);
         }
-    };
-
-    const getStationNameById = (id) => {
-        const station = stations.find((station) => station._id === id);
-        return station ? station.name : "";
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <TextField
-                label="Station Name"
-                value={getStationNameById(stationId)}
+            <Select
+                label="Station"
+                name="station_id"
+                value={stationId}
                 onChange={(e) => setStationId(e.target.value)}
-            />
+                required
+                fullWidth
+            >
+                {stations.map((station) => (
+                    <MenuItem key={station._id} value={station._id}>
+                        {station.name}
+                    </MenuItem>
+                ))}
+            </Select>
             <TextField
                 label="Purchase Method"
+                name="purchase_method"
                 value={purchaseMethod}
                 onChange={(e) => setPurchaseMethod(e.target.value)}
+                required
+                fullWidth
             />
-            <TextField
-                label="Destination Name"
-                value={getStationNameById(destinationId)}
+            <Select
+                label="Destination ID"
+                name="destination_id"
+                value={destinationId}
                 onChange={(e) => setDestinationId(e.target.value)}
-            />
+                required
+                fullWidth
+            >
+                {stations.map((station) => (
+                    <MenuItem key={station._id} value={station._id}>
+                        {station.name}
+                    </MenuItem>
+                ))}
+            </Select>
             <Button type="submit" variant="contained">
                 Create Ticket
             </Button>

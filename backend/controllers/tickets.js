@@ -28,9 +28,10 @@ export const getTickets = async (req, res) => {
 
 export const createTicket = async (req, res) => {
     try {
-        const { station_id, purchase_method, destination_id } = req.body;
+        const { station_id, purchase_method, destination_id, passenger_id } =
+            req.body;
 
-        const passenger_id = req.user._id;
+        //const passenger_id = req.user._id;
 
         if (!passenger_id) {
             return res
@@ -55,9 +56,10 @@ export const createTicket = async (req, res) => {
             { $push: { tickets: newTicket._id } }
         );
 
+        console.log(newTicket);
         res.status(201).json(newTicket);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "error createTicket " + err.message });
     }
 };
 
