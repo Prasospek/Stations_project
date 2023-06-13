@@ -19,15 +19,15 @@ import * as yup from "yup";
 const registerSchema = yup.object().shape({
     firstName: yup
         .string()
-        .min(2, "Password must be at least 2 characters a-Z0-9")
+        .min(2, "FirstName must be at least 2 characters a-Z0-9")
         .required("required and must be at least 2 characters a-Z0-9"),
     lastName: yup
         .string()
-        .min(2, "Password must be at least 2 characters a-Z0-9")
+        .min(2, " Lastname must be at least 2 characters a-Z0-9")
         .required("required and must be at least 2 characters a-Z0-9"),
     email: yup
         .string()
-        .email("Email must contain @ followed by .com .cz etc")
+        .email("Email must contain @ followed by .com .cz etc (test@test.com)")
         .required("required"),
     password: yup
         .string()
@@ -109,7 +109,7 @@ const AdminPage = () => {
             }
         } catch (error) {
             console.error("Error saving changes:", error);
-            toast.error("Error, there was a mistake!");
+            toast.error(error.message);
         }
     };
 
