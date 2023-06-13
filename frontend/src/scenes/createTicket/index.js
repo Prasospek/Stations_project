@@ -16,23 +16,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const stations = {
+    Station1: "6485f933e63353dd9f5c4a85",
+    Station2: "6485f944e63353dd9f5c4a87",
+    Station3: "6485f948e63353dd9f5c4a89",
+    Station4: "6485f94ce63353dd9f5c4a8b",
+    Station5: "6485f94fe63353dd9f5c4a8d",
+    Station6: "6485f951e63353dd9f5c4a8f",
+    Station7: "6485f956e63353dd9f5c4a91",
+};
+
 const ticketSchema = yup.object().shape({
     station_id: yup
         .string()
-        .oneOf(
-            [
-                "Station1",
-                "Station2",
-                "Station3",
-                "Station4",
-                "Station5",
-                "Station6",
-                "Station7",
-            ],
-            "Invalid Starter Station"
-        )
-        .required("Starter Station is required")
-        .min(7, "Select please Either of viable Stations"),
+        .oneOf(Object.keys(stations), "Invalid Starter Station")
+        .required("Starter Station is required"),
     purchase_method: yup
         .string()
         .oneOf(
@@ -42,27 +40,15 @@ const ticketSchema = yup.object().shape({
         .required("Purchase Method is required"),
     destination_id: yup
         .string()
-        .oneOf(
-            [
-                "Station1",
-                "Station2",
-                "Station3",
-                "Station4",
-                "Station5",
-                "Station6",
-                "Station7",
-            ],
-            "Invalid Destination Station"
-        )
-        .min(7, "Select please Either of viable Stations")
+        .oneOf(Object.keys(stations), "Invalid Destination Station")
         .required("Destination Station is required"),
 });
 
 const initialValues = {
-    station_id: "", // Update the field name
+    station_id: "",
     station_name: "",
     purchase_method: "",
-    destination_id: "", // Update the field name
+    destination_id: "",
     destination_name: "",
 };
 
@@ -71,40 +57,45 @@ const CreateTicket = () => {
     const dispatch = useDispatch();
     const isNonMobile = useMediaQuery("(min-width:800px)");
 
-    const [stations, setStations] = useState([]);
-
     const user = useSelector((state) => state.user._id);
 
-    useEffect(() => {
-        const fetchStations = async () => {
-            try {
-                const response = await fetch("http://localhost:8001/stations");
-                const data = await response.json();
-                setStations(data);
-            } catch (error) {
-                console.error("Error fetching stations:", error);
-            }
-        };
+    const createTicketHandle = async (values, onSubmitProps) => {
+        try {
+            const stationId = stations[values.station_id]; // Get the corresponding ID from the stations object
+            const destinationId = stations[values.destination_id]; // Get the corresponding ID from the stations object
 
-        fetchStations();
-    }, []);
+            const payload = {
+                ...values,
+                station_id: stationId,
+                destination_id: destinationId,
+            };
 
-    const createTicket = async (values, onSubmitProps) => {
-        const createTicketResponse = await fetch(
-            "http://localhost:8001/tickets",
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(values),
+            const createTicketResponse = await fetch(
+                "http://localhost:8001/tickets",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                }
+            );
+
+            if (createTicketResponse.ok) {
+                // Ticket created successfully
+                toast.success("Ticket created successfully!");
+                onSubmitProps.resetForm();
+            } else {
+                // Error occurred while creating ticket
+                const errorData = await createTicketResponse.json();
+                toast.error(errorData.message);
             }
-        );
-        const registered = await createTicketResponse.json();
+        } catch (error) {
+            console.error("Error creating ticket:", error);
+            toast.error("An error occurred while creating the ticket.");
+        }
     };
 
     const handleFormSubmit = async (values, onSubmitProps) => {
-        createTicket();
-        toast.success("Ticket created successfully!");
-        onSubmitProps.resetForm();
+        createTicketHandle(values, onSubmitProps); // Pass the values to createTicketHandle function
     };
 
     return (
@@ -152,8 +143,8 @@ const CreateTicket = () => {
                                         label="Starter Station"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        value={values.station_id} // Update the field name
-                                        name="station_id" // Update the field name
+                                        value={values.station_id}
+                                        name="station_id"
                                         error={
                                             Boolean(touched.station_id) &&
                                             Boolean(errors.station_id)
@@ -169,8 +160,8 @@ const CreateTicket = () => {
                                         label="Destination Station"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        value={values.destination_id} // Update the field name
-                                        name="destination_id" // Update the field name
+                                        value={values.destination_id}
+                                        name="destination_id"
                                         error={
                                             Boolean(touched.destination_id) &&
                                             Boolean(errors.destination_id)
