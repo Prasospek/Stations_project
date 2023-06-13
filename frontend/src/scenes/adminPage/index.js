@@ -73,9 +73,13 @@ const AdminPage = () => {
             );
 
             if (confirmed) {
+
+                // SO THE HASH DOESNT CHANGE WITH EVERY POST REQ.
+                const { password, ...userWithoutPassword } = editedUser;
+
                 await axios.put(
                     `http://localhost:8001/users/${editedUser._id}`,
-                    editedUser
+                    userWithoutPassword
                 );
                 // Update the user in the users state
                 setUsers((prevUsers) =>
