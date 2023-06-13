@@ -19,11 +19,11 @@ import * as yup from "yup";
 const registerSchema = yup.object().shape({
     firstName: yup
         .string()
-        .min(2, "FirstName must be at least 2 characters a-Z0-9")
+        .min(2, "First Name must be at least 2 characters a-Z0-9")
         .required("required and must be at least 2 characters a-Z0-9"),
     lastName: yup
         .string()
-        .min(2, " Lastname must be at least 2 characters a-Z0-9")
+        .min(2, " Last Name must be at least 2 characters a-Z0-9")
         .required("required and must be at least 2 characters a-Z0-9"),
     email: yup
         .string()
@@ -263,13 +263,6 @@ const AdminPage = () => {
                                     fontSize={"0.95rem"}
                                 >
                                     <strong>Password:</strong> {user.password}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>Role:</strong> {user.role}
                                 </Typography>
 
                                 <Box marginTop="1rem" display="flex">
