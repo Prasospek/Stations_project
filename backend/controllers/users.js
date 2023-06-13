@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Ticket from "../models/Ticket.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { isValidObjectId } from "mongoose";
@@ -109,13 +110,24 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const foundUser = await User.findByIdAndDelete(id);
 
+        // Find the user and retrieve their ticket IDs
+        const foundUser = await User.findById(id).populate("tickets");
         if (!foundUser) {
-            return res.status(404).json({ error: "User not found !" });
+            return res.status(404).json({ error: "User not found!" });
         }
 
-        res.status(200).json({ message: "User deleted successfully" });
+        const ticketIds = foundUser.tickets.map((ticket) => ticket._id);
+
+        // Delete the user and their associated tickets
+        await Promise.all([
+            User.findByIdAndDelete(id), // Delete the user
+            Ticket.deleteMany({ _id: { $in: ticketIds } }), // Delete the associated tickets
+        ]);
+
+        res.status(200).json({
+            message: "User and associated tickets deleted successfully",
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

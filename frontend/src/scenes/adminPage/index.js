@@ -14,26 +14,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import * as yup from "yup";
-
-const registerSchema = yup.object().shape({
-    firstName: yup
-        .string()
-        .min(2, "First Name must be at least 2 characters a-Z0-9")
-        .required("required and must be at least 2 characters a-Z0-9"),
-    lastName: yup
-        .string()
-        .min(2, " Last Name must be at least 2 characters a-Z0-9")
-        .required("required and must be at least 2 characters a-Z0-9"),
-    email: yup
-        .string()
-        .email("Email must contain @ followed by .com .cz etc (test@test.com)")
-        .required("required"),
-    password: yup
-        .string()
-        .min(5, "Password must be at least 5 characters")
-        .required("required"),
-});
 
 const AdminPage = () => {
     const { palette } = useTheme();
@@ -91,9 +71,8 @@ const AdminPage = () => {
             const confirmed = window.confirm(
                 "Do you want to save the changes you made?"
             );
+
             if (confirmed) {
-                await registerSchema.validate(editedUser); // Validate the editedUser object
-                // If validation passes, proceed with saving changes
                 await axios.put(
                     `http://localhost:8001/users/${editedUser._id}`,
                     editedUser
@@ -109,7 +88,7 @@ const AdminPage = () => {
             }
         } catch (error) {
             console.error("Error saving changes:", error);
-            toast.error(error.message);
+            toast.error("Error, there was a mistake!");
         }
     };
 
@@ -263,6 +242,13 @@ const AdminPage = () => {
                                     fontSize={"0.95rem"}
                                 >
                                     <strong>Password:</strong> {user.password}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Role:</strong> {user.role}
                                 </Typography>
 
                                 <Box marginTop="1rem" display="flex">
