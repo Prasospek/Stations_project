@@ -14,6 +14,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Formik } from "formik";
+import * as yup from "yup";
 
 const AdminPage = () => {
     const { palette } = useTheme();
@@ -26,9 +28,33 @@ const AdminPage = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedUser, setEditedUser] = useState({});
 
+    /* FORMIK YUP */
+
+    const registerSchema = yup.object().shape({
+        firstName: yup
+            .string()
+            .min(2, "Password must be at least 2 characters a-Z0-9")
+            .required("required and must be at least 2 characters a-Z0-9"),
+        lastName: yup
+            .string()
+            .min(2, "Password must be at least 2 characters a-Z0-9")
+            .required("required and must be at least 2 characters a-Z0-9"),
+        email: yup
+            .string()
+            .email("Email must contain @ followed by .com .cz etc")
+            .required("required"),
+        password: yup
+            .string()
+            .min(5, "Password must be at least 5 characters")
+            .required("required"),
+    });
+
     const fetchUsers = async () => {
         try {
-            const response = await axios.get("http://localhost:8001/users");
+            //const response = await axios.get("http://localhost:8001/users");
+            const response = await axios.get(
+                "http://localhost:8001/users?_embed=tickets"
+            );
             const data = response.data;
             setUsers(data);
         } catch (error) {
@@ -122,101 +148,183 @@ const AdminPage = () => {
                         display="flex"
                         alignItems="center"
                         justifyContent="space-between"
-                        borderRadius="4px"
-                        width={isMobile ? "100%" : "45%"}
+                        borderRadius="7px"
+                        width={isMobile ? "100%" : "49%"}
                     >
                         {isEditing && editedUser._id === user._id ? (
                             <div>
                                 <Typography variant="h6">
                                     Editing User:
                                 </Typography>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        First Name:
-                                    </Typography>
-                                    <input
-                                        type="text"
-                                        value={editedUser.firstName}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                firstName: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Last Name:
-                                    </Typography>
-                                    <input
-                                        type="text"
-                                        value={editedUser.lastName}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                lastName: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Email:
-                                    </Typography>
-                                    <input
-                                        type="email"
-                                        value={editedUser.email}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                email: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Password:
-                                    </Typography>
-                                    <input
-                                        type="password"
-                                        value={editedUser.password}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                password: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem" display="flex">
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleSaveChanges}
-                                        sx={{ marginRight: "1rem" }}
-                                    >
-                                        Save
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleCancelEdit}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </Box>
+                                <Formik
+                                    initialValues={{
+                                        firstName: editedUser.firstName,
+                                        lastName: editedUser.lastName,
+                                        email: editedUser.email,
+                                        password: editedUser.password,
+                                    }}
+                                    validationSchema={registerSchema}
+                                    onSubmit={handleSaveChanges}
+                                >
+                                    {({
+                                        values,
+                                        handleChange,
+                                        handleSubmit,
+                                        errors,
+                                        touched,
+                                    }) => (
+                                        <form onSubmit={handleSubmit}>
+                                            <Box marginTop="1rem">
+                                                <Typography variant="body1">
+                                                    First Name:
+                                                </Typography>
+                                                <input
+                                                    type="text"
+                                                    name="firstName"
+                                                    value={values.firstName}
+                                                    onChange={handleChange}
+                                                />
+                                                {errors.firstName &&
+                                                    touched.firstName && (
+                                                        <Typography
+                                                            variant="body2"
+                                                            color="error"
+                                                            style={{
+                                                                color: "black",
+                                                            }}
+                                                        >
+                                                            {errors.firstName}
+                                                        </Typography>
+                                                    )}
+                                            </Box>
+                                            <Box marginTop="1rem">
+                                                <Typography variant="body1">
+                                                    Last Name:
+                                                </Typography>
+                                                <input
+                                                    type="text"
+                                                    name="lastName"
+                                                    value={values.lastName}
+                                                    onChange={handleChange}
+                                                />
+                                                {errors.lastName &&
+                                                    touched.lastName && (
+                                                        <Typography
+                                                            variant="body2"
+                                                            color="error"
+                                                        >
+                                                            {errors.lastName}
+                                                        </Typography>
+                                                    )}
+                                            </Box>
+                                            <Box marginTop="1rem">
+                                                <Typography variant="body1">
+                                                    Email:
+                                                </Typography>
+                                                <input
+                                                    type="email"
+                                                    name="email"
+                                                    value={values.email}
+                                                    onChange={handleChange}
+                                                />
+                                                {errors.email &&
+                                                    touched.email && (
+                                                        <Typography
+                                                            variant="body2"
+                                                            color="error"
+                                                        >
+                                                            {errors.email}
+                                                        </Typography>
+                                                    )}
+                                            </Box>
+                                            <Box marginTop="1rem">
+                                                <Typography variant="body1">
+                                                    Password:
+                                                </Typography>
+                                                <input
+                                                    type="password"
+                                                    name="password"
+                                                    value={values.password}
+                                                    onChange={handleChange}
+                                                />
+                                                {errors.password &&
+                                                    touched.password && (
+                                                        <Typography
+                                                            variant="body2"
+                                                            color="error"
+                                                        >
+                                                            {errors.password}
+                                                        </Typography>
+                                                    )}
+                                            </Box>
+                                            <Box
+                                                marginTop="1rem"
+                                                display="flex"
+                                            >
+                                                <Button
+                                                    type="submit"
+                                                    variant="contained"
+                                                >
+                                                    Save
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={handleCancelEdit}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </Box>
+                                        </form>
+                                    )}
+                                </Formik>
                             </div>
                         ) : (
                             <div>
-                                <Typography variant="h6">{`${user.firstName} ${user.lastName}`}</Typography>
-                                <Typography variant="h6">{`First name: ${user.firstName}`}</Typography>
-                                <Typography variant="h6">{`Last name: ${user.lastName}`}</Typography>
-                                <Typography variant="body1">{`Email: ${user.email}`}</Typography>
+                                <Typography
+                                    variant="h3"
+                                    gutterBottom
+                                    fontSize={"1.5rem"}
+                                >
+                                    {`${user.firstName} ${user.lastName}`}
+                                </Typography>
                                 <Typography
                                     variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>First Name:</strong>{" "}
+                                    {user.firstName}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Last Name:</strong> {user.lastName}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Email:</strong> {user.email}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
                                     style={{ wordBreak: "break-word" }}
-                                >{`Password: ${user.password}`}</Typography>
-                                <Box marginTop="1rem" display="flex">
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Password:</strong> {user.password}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Role:</strong> {user.role}
+                                </Typography>
+                                <Box marginTop="0.95rem" display="flex">
                                     <IconButton
                                         color="inherit"
                                         onClick={() =>
