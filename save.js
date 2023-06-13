@@ -6,6 +6,7 @@ import {
     useMediaQuery,
     Typography,
     Button,
+    TextField,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +15,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Formik, Field } from "formik";
+import * as yup from "yup";
 
 const AdminPage = () => {
     const { palette } = useTheme();
@@ -26,9 +29,33 @@ const AdminPage = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedUser, setEditedUser] = useState({});
 
+    /* FORMIK YUP */
+
+    const registerSchema = yup.object().shape({
+        firstName: yup
+            .string()
+            .min(2, "Password must be at least 2 characters a-Z0-9")
+            .required("required and must be at least 2 characters a-Z0-9"),
+        lastName: yup
+            .string()
+            .min(2, "Password must be at least 2 characters a-Z0-9")
+            .required("required and must be at least 2 characters a-Z0-9"),
+        email: yup
+            .string()
+            .email("Email must contain @ followed by .com .cz etc")
+            .required("required"),
+        password: yup
+            .string()
+            .min(5, "Password must be at least 5 characters")
+            .required("required"),
+    });
+
     const fetchUsers = async () => {
         try {
-            const response = await axios.get("http://localhost:8001/users");
+            //const response = await axios.get("http://localhost:8001/users");
+            const response = await axios.get(
+                "http://localhost:8001/users?_embed=tickets"
+            );
             const data = response.data;
             setUsers(data);
         } catch (error) {
@@ -53,9 +80,7 @@ const AdminPage = () => {
                     prevUsers.filter((user) => user._id !== userId)
                 );
                 console.log(`Removing user with ID: ${userId}`);
-                toast.success(
-                    `${user.firstName} ${user.lastName} deleted successfully!`
-                );
+                toast.success(`User deleted successfully!`);
             } catch (error) {
                 console.error("Error removing user:", error);
                 toast.error("Error, there was a mistake!");
@@ -68,20 +93,27 @@ const AdminPage = () => {
         setEditedUser(user);
     };
 
-    const handleSaveChanges = async () => {
+    const handleSaveChanges = async (values) => {
         try {
-            await axios.put(
-                `http://localhost:8001/users/${editedUser._id}`,
-                editedUser
+            const confirmed = window.confirm(
+                "Do you want to save the changes you made?"
             );
-            // Update the user in the users state
-            setUsers((prevUsers) =>
-                prevUsers.map((user) =>
-                    user._id === editedUser._id ? editedUser : user
-                )
-            );
-            setIsEditing(false);
-            toast.success("Changes saved successfully!");
+
+            if (confirmed) {
+                await axios.put(
+                    `http://localhost:8001/users/${editedUser._id}`,
+                    values
+                );
+                // Update the user in the users state
+                setUsers((prevUsers) =>
+                    prevUsers.map((user) =>
+                        user._id === editedUser._id ? values : user
+                    )
+                );
+                setIsEditing(false);
+                setEditedUser({});
+                toast.success("Changes saved successfully!");
+            }
         } catch (error) {
             console.error("Error saving changes:", error);
             toast.error("Error, there was a mistake!");
@@ -116,109 +148,170 @@ const AdminPage = () => {
                         display="flex"
                         alignItems="center"
                         justifyContent="space-between"
-                        borderRadius="4px"
-                        width={isMobile ? "100%" : "45%"}
+                        borderRadius="7px"
+                        width={isMobile ? "100%" : "49%"}
                     >
                         {isEditing && editedUser._id === user._id ? (
                             <div>
                                 <Typography variant="h6">
                                     Editing User:
                                 </Typography>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        First Name:
-                                    </Typography>
-                                    <input
-                                        type="text"
-                                        value={editedUser.firstName}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                firstName: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Last Name:
-                                    </Typography>
-                                    <input
-                                        type="text"
-                                        value={editedUser.lastName}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                lastName: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Email:
-                                    </Typography>
-                                    <input
-                                        type="email"
-                                        value={editedUser.email}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                email: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Password:
-                                    </Typography>
-                                    <input
-                                        type="password"
-                                        value={editedUser.password}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                password: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem" display="flex">
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleSaveChanges}
-                                        sx={{ marginRight: "1rem" }}
-                                    >
-                                        Save
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleCancelEdit}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </Box>
+                                <Formik
+                                    initialValues={{
+                                        firstName: editedUser.firstName,
+                                        lastName: editedUser.lastName,
+                                        email: editedUser.email,
+                                        password: editedUser.password,
+                                    }}
+                                    validationSchema={registerSchema}
+                                    onSubmit={handleSaveChanges}
+                                >
+                                    {({ handleSubmit, errors, touched }) => (
+                                        <form onSubmit={handleSubmit}>
+                                            <Box marginTop="1rem">
+                                                <Typography variant="body1">
+                                                    First Name:
+                                                </Typography>
+                                                <Field
+                                                    type="text"
+                                                    name="firstName"
+                                                    as={TextField}
+                                                    error={
+                                                        errors.firstName &&
+                                                        touched.firstName
+                                                    }
+                                                    helperText={
+                                                        errors.firstName &&
+                                                        touched.firstName &&
+                                                        errors.firstName
+                                                    }
+                                                />
+                                            </Box>
+                                            <Box marginTop="1rem">
+                                                <Typography variant="body1">
+                                                    Last Name:
+                                                </Typography>
+                                                <Field
+                                                    type="text"
+                                                    name="lastName"
+                                                    as={TextField}
+                                                    error={
+                                                        errors.lastName &&
+                                                        touched.lastName
+                                                    }
+                                                    helperText={
+                                                        errors.lastName &&
+                                                        touched.lastName &&
+                                                        errors.lastName
+                                                    }
+                                                />
+                                            </Box>
+                                            <Box marginTop="1rem">
+                                                <Typography variant="body1">
+                                                    Email:
+                                                </Typography>
+                                                <Field
+                                                    type="email"
+                                                    name="email"
+                                                    as={TextField}
+                                                    error={
+                                                        errors.email &&
+                                                        touched.email
+                                                    }
+                                                    helperText={
+                                                        errors.email &&
+                                                        touched.email &&
+                                                        errors.email
+                                                    }
+                                                />
+                                            </Box>
+                                            <Box marginTop="1rem">
+                                                <Typography variant="body1">
+                                                    Password:
+                                                </Typography>
+                                                <Field
+                                                    type="password"
+                                                    name="password"
+                                                    as={TextField}
+                                                    error={
+                                                        errors.password &&
+                                                        touched.password
+                                                    }
+                                                    helperText={
+                                                        errors.password &&
+                                                        touched.password &&
+                                                        errors.password
+                                                    }
+                                                />
+                                            </Box>
+                                            <Box
+                                                marginTop="1rem"
+                                                display="flex"
+                                            >
+                                                <Button
+                                                    type="submit"
+                                                    variant="contained"
+                                                >
+                                                    Save
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={handleCancelEdit}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </Box>
+                                        </form>
+                                    )}
+                                </Formik>
                             </div>
                         ) : (
                             <div>
-                                <Typography variant="h6">{`${user.firstName} ${user.lastName}`}</Typography>
-                                <Typography variant="body1">{`Email: ${user.email}`}</Typography>
-                                <Typography variant="body1">{`Password: ${user.password}`}</Typography>
-                                <Box marginTop="1rem" display="flex">
+                                <Typography
+                                    variant="h3"
+                                    gutterBottom
+                                    fontSize={"1.5rem"}
+                                >
+                                    {`${user.firstName} ${user.lastName}`}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>First Name:</strong>{" "}
+                                    {user.firstName}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Last Name:</strong> {user.lastName}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Email:</strong> {user.email}
+                                </Typography>
+                                <Box marginTop="1rem">
                                     <IconButton
                                         color="inherit"
+                                        aria-label="Edit User"
+                                        onClick={() => handleUpdateUser(user)}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        color="inherit"
+                                        aria-label="Delete User"
                                         onClick={() =>
                                             handleRemoveUser(user._id)
                                         }
                                     >
                                         <DeleteIcon />
-                                    </IconButton>
-                                    <IconButton
-                                        color="inherit"
-                                        onClick={() => handleUpdateUser(user)}
-                                    >
-                                        <EditIcon />
                                     </IconButton>
                                 </Box>
                             </div>

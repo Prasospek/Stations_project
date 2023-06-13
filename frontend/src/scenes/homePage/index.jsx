@@ -37,8 +37,6 @@ const HomePage = () => {
         setShowModal(false);
     };
 
-   
-
     return (
         <div>
             <Navbar />
@@ -204,6 +202,7 @@ const HomePage = () => {
             {userRole === "admin" && (
                 <>
                     <AdminPage />
+                    <Box paddingBottom={"5rem"}></Box>
                 </>
             )}
             <Footer />
