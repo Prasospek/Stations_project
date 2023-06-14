@@ -52,7 +52,6 @@ export const updateUser = async (req, res) => {
 
     const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
     const secureRegex = /^[a-zA-Z0-9$./]+$/;
-    const salt = await bcrypt.genSalt(10);
 
     // Validation for firstName, lastName, password, and email
     if (
@@ -77,9 +76,8 @@ export const updateUser = async (req, res) => {
             return res.status(404).json({ error: "User not found!" });
         }
 
-        const updatedRole = req.body.role ? req.body.role : user.role;
+        const updatedRole = req.body.role || user.role;
 
-        // Spread so I can only update the fields I want and not the whole object!
         const updateFields = {
             ...(firstName && { firstName }),
             ...(lastName && { lastName }),
@@ -88,15 +86,19 @@ export const updateUser = async (req, res) => {
         };
 
         if (password) {
+            const salt = await bcrypt.genSalt(10);
             const passwordHash = await bcrypt.hash(password, salt);
             updateFields.password = passwordHash;
         }
 
         if (tickets) {
-            updateFields.tickets = [...user.tickets, ...tickets];
+            // Replace existing tickets with new ones
+            updateFields.tickets = tickets;
         }
 
-        const updatedUser = await User.findByIdAndUpdate(id, updateFields);
+        const updatedUser = await User.findByIdAndUpdate(id, updateFields, {
+            new: true,
+        });
 
         res.status(200).json({
             message: "User updated successfully",
