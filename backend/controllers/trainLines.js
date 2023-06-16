@@ -153,3 +153,38 @@ export async function findPath(req, res) {
         res.status(500).json({ error: "Internal server error" });
     }
 }
+
+export const getTrainLine = async (req, res) => {
+    try {
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getTrainLines = async (req, res) => {
+    try {
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const updateTrainLine = async (req, res) => {
+    try {
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const deleteTrainLine = async (req, res) => {
+    try {
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const createTrainLine = async (req, res) => {
+    try {
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

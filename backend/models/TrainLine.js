@@ -18,6 +18,10 @@ const trainLineSchema = new mongoose.Schema(
             enum: ["operational", "disruption", "maintenance"],
             required: true,
         },
+        time: {
+            type: Number,
+            required: true,
+        },
     },
     { timestamps: true }
 );
