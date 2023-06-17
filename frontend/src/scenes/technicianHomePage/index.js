@@ -1,7 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+    Box,
+    Typography,
+    useMediaQuery,
+    useTheme,
+    IconButton,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const TechnicianHomePage = () => {
     const { palette } = useTheme();
@@ -13,6 +28,9 @@ const TechnicianHomePage = () => {
     const [trainLines, setTrainLines] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedOption, setSelectedOption] = useState("");
+    const [selectedTrainLineId, setSelectedTrainLineId] = useState(null); // New state for selected train line ID
 
     const fetchStationName = async (stationId) => {
         try {
@@ -46,7 +64,7 @@ const TechnicianHomePage = () => {
 
         fetchTrainLines();
     }, []);
-    // adding [] so it doesnt fetch 24/7 but only when changed
+    // adding [] so it doesn't fetch 24/7 but only when changed
 
     const [stationNames, setStationNames] = useState({});
 
@@ -77,6 +95,45 @@ const TechnicianHomePage = () => {
     if (error) {
         return <div>Error: {error}</div>;
     }
+
+    const handleUpdater = (trainLineId) => {
+        setSelectedTrainLineId(trainLineId); // Store the selected train line ID
+        setDialogOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+    };
+
+    const handleOptionSelect = async (option) => {
+        try {
+            setSelectedOption(option);
+            setDialogOpen(false); // Close the dialog
+
+            const confirmed = window.confirm(
+                "Do you want to save the changes you made?"
+            );
+            if (confirmed) {
+                const updatedTrainLines = trainLines.map((trainLine) => {
+                    if (trainLine._id === selectedTrainLineId) {
+                        return { ...trainLine, status: option };
+                    }
+                    return trainLine;
+                });
+
+                setTrainLines(updatedTrainLines); // Update the train lines with the updated status
+                toast.success("Changes saved successfully!");
+
+                await axios.put(
+                    `http://localhost:8001/trainlines/${selectedTrainLineId}`,
+                    { status: option }
+                );
+            }
+        } catch (error) {
+            console.error("Error saving changes:", error);
+            toast.error(error.message);
+        }
+    };
 
     return (
         <div>
@@ -147,11 +204,48 @@ const TechnicianHomePage = () => {
                             <b>Time: </b>
                             {trainLine.time}
                         </p>
+                        <Box display="flex" justifyContent="left" mt={2}>
+                            <IconButton
+                                onClick={() => handleUpdater(trainLine._id)}
+                            >
+                                <EditIcon />
+                            </IconButton>
+                        </Box>
                     </Box>
                 ))}
             </Box>
 
-            <Box mb={5}></Box>
+            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+                <DialogTitle>Select Status</DialogTitle>
+                <DialogContent>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => handleOptionSelect("operational")}
+                        style={{ marginRight: "10px" }}
+                    >
+                        Operational
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => handleOptionSelect("disruption")}
+                        style={{ marginRight: "10px" }}
+                    >
+                        Disruption
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => handleOptionSelect("maintenance")}
+                    >
+                        Maintenance
+                    </Button>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogClose}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

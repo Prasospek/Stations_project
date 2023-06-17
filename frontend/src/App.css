@@ -15,6 +15,14 @@
     margin-right: 10px;
 }
 
+.disruption-button:hover {
+    background-color: red !important;
+}
+
+.maintenance-button:hover {
+    background-color: yellow !important;
+}
+
 @keyframes roll {
     0% {
         transform: translateX(0%);
