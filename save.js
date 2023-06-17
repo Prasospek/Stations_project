@@ -1,279 +1,151 @@
 import React, { useEffect, useState } from "react";
-import {
-    Box,
-    useTheme,
-    IconButton,
-    useMediaQuery,
-    Typography,
-    Button,
-} from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-const AdminPage = () => {
+const TechnicianHomePage = () => {
     const { palette } = useTheme();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const user = useSelector((state) => state.user);
-    const isMobile = useMediaQuery("(max-width:800px)");
+    const isNonMobile = useMediaQuery("(min-width:800px)");
+    const isSmallScreen = useMediaQuery("(max-width:600px)");
 
-    const [users, setUsers] = useState([]);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedUser, setEditedUser] = useState({});
+    const [trainLines, setTrainLines] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const fetchUsers = async () => {
+    const fetchStationName = async (stationId) => {
         try {
-            const response = await axios.get("http://localhost:8001/users");
-            const data = response.data;
-            setUsers(data);
+            const response = await fetch(
+                `http://localhost:8001/stations/${stationId}`
+            );
+            const data = await response.json();
+            return data.name;
         } catch (error) {
-            console.error("Error fetching users:", error);
+            console.error("Error fetching station:", error);
+            return null;
         }
     };
 
     useEffect(() => {
-        fetchUsers();
+        const fetchTrainLines = async () => {
+            try {
+                const response = await fetch(
+                    "http://localhost:8001/trainlines"
+                );
+                const data = await response.json();
+                setTrainLines(data);
+                setLoading(false);
+                console.log(data);
+            } catch (error) {
+                console.error("Error fetching stations:", error);
+                setError("Failed to fetch stations");
+                setLoading(false);
+            }
+        };
+
+        fetchTrainLines();
     }, []);
 
-    const handleRemoveUser = async (userId) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this user?"
-        );
+    const [stationNames, setStationNames] = useState({});
 
-        if (confirmed) {
-            try {
-                await axios.delete(`http://localhost:8001/users/${userId}`);
-                // Remove the deleted user from the users state
-                setUsers((prevUsers) =>
-                    prevUsers.filter((user) => user._id !== userId)
-                );
-                console.log(`Removing user with ID: ${userId}`);
-                toast.success(`User deleted successfully!`);
-            } catch (error) {
-                console.error("Error removing user:", error);
-                toast.error("Error, there was a mistake!");
-            }
-        }
-    };
+    useEffect(() => {
+        const fetchAllStationNames = async () => {
+            const stationNamesMap = {};
 
-    const handleUpdateUser = (user) => {
-        setIsEditing(true);
-        setEditedUser(user);
-    };
-
-    const handleSaveChanges = async () => {
-        try {
-            const confirmed = window.confirm(
-                "Do you want to save the changes you made?"
+            await Promise.all(
+                trainLines.map(async (trainLine) => {
+                    const name = await fetchStationName(trainLine.station_id);
+                    stationNamesMap[trainLine.station_id] = name;
+                })
             );
+            setStationNames(stationNamesMap);
+        };
 
-            if (confirmed) {
-                await axios.put(
-                    `http://localhost:8001/users/${editedUser._id}`,
-                    editedUser
-                );
-                // Update the user in the users state
-                setUsers((prevUsers) =>
-                    prevUsers.map((user) =>
-                        user._id === editedUser._id ? editedUser : user
-                    )
-                );
-                setIsEditing(false);
-                toast.success("Changes saved successfully!");
-            }
-        } catch (error) {
-            console.error("Error saving changes:", error);
-            toast.error("Error, there was a mistake!");
-        }
-    };
+        fetchAllStationNames();
+    }, [trainLines]);
 
-    const handleCancelEdit = () => {
-        setIsEditing(false);
-        setEditedUser({});
-    };
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div>
-            <ToastContainer />
-            <div
-                style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    justifyContent: "space-between",
-                    marginLeft: "3rem",
-                    marginRight: "3rem",
-                    marginTop: "2rem",
-                }}
+            <Box
+                p={2}
+                display="flex"
+                flexDirection={isSmallScreen ? "column" : "row"}
+                flexWrap="wrap"
             >
-                {users.map((user) => (
+                {trainLines.map((trainLine, index) => (
                     <Box
-                        key={user._id}
-                        bgcolor={palette.primary.main}
-                        color={palette.background.alt}
-                        padding="1rem"
-                        marginBottom="1rem"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        borderRadius="4px"
-                        width={isMobile ? "100%" : "45%"}
+                        key={trainLine._id}
+                        style={{
+                            backgroundColor: palette.primary.main,
+                            color: palette.primary.contrastText,
+                            marginBottom: "14px",
+                            padding: "0 14px 14px",
+                            borderRadius: "8px",
+                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                            width: isNonMobile ? "calc(50% - 15px)" : "100%",
+                            marginRight:
+                                isNonMobile && index % 2 === 0 ? "15px" : "0",
+                        }}
                     >
-                        {isEditing && editedUser._id === user._id ? (
-                            <div>
-                                <Typography variant="h6">
-                                    Editing User:
-                                </Typography>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        First Name:
-                                    </Typography>
-                                    <input
-                                        type="text"
-                                        value={editedUser.firstName}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                firstName: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Last Name:
-                                    </Typography>
-                                    <input
-                                        type="text"
-                                        value={editedUser.lastName}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                lastName: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Email:
-                                    </Typography>
-                                    <input
-                                        type="email"
-                                        value={editedUser.email}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                email: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Password:
-                                    </Typography>
-                                    <input
-                                        type="password"
-                                        value={editedUser.password}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                password: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem" display="flex">
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleSaveChanges}
-                                        sx={{ marginRight: "1rem" }}
-                                    >
-                                        Save
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleCancelEdit}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </Box>
-                            </div>
-                        ) : (
-                            <div>
-                                <Typography
-                                    variant="h3"
-                                    gutterBottom
-                                    fontSize={"1.5rem"}
-                                >
-                                    {`${user.firstName} ${user.lastName}`}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>First Name:</strong>{" "}
-                                    {user.firstName}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>Last Name:</strong> {user.lastName}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>Email:</strong> {user.email}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    style={{ wordBreak: "break-word" }}
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>Password:</strong> {user.password}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>Role:</strong> {user.role}
-                                </Typography>
+                        <h2
+                            style={{
+                                fontSize: "27px",
+                                marginBottom: "4px",
+                                fontFamily: "Arial, sans-serif",
+                                fontWeight: "bold",
+                                textTransform: "uppercase",
+                            }}
+                        >
+                            {trainLine.name}
+                        </h2>
 
-                                <Box marginTop="1rem" display="flex">
-                                    <IconButton
-                                        color="inherit"
-                                        onClick={() =>
-                                            handleRemoveUser(user._id)
-                                        }
-                                    >
-                                        <DeleteIcon />
-                                    </IconButton>
-                                    <IconButton
-                                        color="inherit"
-                                        onClick={() => handleUpdateUser(user)}
-                                    >
-                                        <EditIcon />
-                                    </IconButton>
-                                </Box>
-                            </div>
+                        {trainLine.stations && (
+                            <p
+                                style={{
+                                    marginBottom: "4px",
+                                    fontFamily: "Arial, sans-serif",
+                                    fontSize: "15px",
+                                }}
+                            >
+                                <b>Stations: {trainLine.stations}</b>{" "}
+                            </p>
                         )}
+                        <p
+                            style={{
+                                marginBottom: "4px",
+                                fontFamily: "Arial, sans-serif",
+                                fontSize: "15px",
+                            }}
+                        >
+                            <b>Status: </b>
+                            {trainLine.status}
+                        </p>
+                        <p
+                            style={{
+                                marginBottom: "4px",
+                                fontFamily: "Arial, sans-serif",
+                                fontSize: "15px",
+                            }}
+                        >
+                            <b>Time: </b>
+                            {trainLine.time}
+                        </p>
                     </Box>
                 ))}
-            </div>
+            </Box>
+
+            <Box mb={5}></Box>
         </div>
     );
 };
 
-export default AdminPage;
+export default TechnicianHomePage;

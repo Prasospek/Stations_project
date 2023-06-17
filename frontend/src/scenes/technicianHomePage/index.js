@@ -14,6 +14,19 @@ const TechnicianHomePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const fetchStationName = async (stationId) => {
+        try {
+            const response = await fetch(
+                `http://localhost:8001/stations/${stationId}`
+            );
+            const data = await response.json();
+            return data.name;
+        } catch (error) {
+            console.error("Error fetching station:", error);
+            return null;
+        }
+    };
+
     useEffect(() => {
         const fetchTrainLines = async () => {
             try {
@@ -33,6 +46,29 @@ const TechnicianHomePage = () => {
 
         fetchTrainLines();
     }, []);
+
+    const [stationNames, setStationNames] = useState({});
+
+    useEffect(() => {
+        const fetchAllStationNames = async () => {
+            const stationNamesMap = {};
+
+            await Promise.all(
+                trainLines.map(async (trainLine) => {
+                    const stationNames = await Promise.all(
+                        trainLine.stations.map(async (stationId) => {
+                            const name = await fetchStationName(stationId);
+                            return name;
+                        })
+                    );
+                    stationNamesMap[trainLine._id] = stationNames;
+                })
+            );
+            setStationNames(stationNamesMap);
+        };
+
+        fetchAllStationNames();
+    }, [trainLines]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -85,25 +121,10 @@ const TechnicianHomePage = () => {
                                     fontSize: "15px",
                                 }}
                             >
-                                <b>Connections:</b>{" "}
-                                {trainLine.stations.map((connectionId) => {
-                                    const connectedTrainLine = trainLines.find(
-                                        (trainLine) =>
-                                            trainLine._id === connectionId
-                                    );
-                                    return connectedTrainLine ? (
-                                        <span
-                                            key={connectionId}
-                                            style={{
-                                                marginLeft: "4px",
-                                                marginRight: "4px",
-                                                fontStyle: "italic",
-                                            }}
-                                        >
-                                            {connectedTrainLine.name}
-                                        </span>
-                                    ) : null;
-                                })}
+                                <b>
+                                    Stations:{" "}
+                                    {stationNames[trainLine._id]?.join(", ")}
+                                </b>
                             </p>
                         )}
                         <p
