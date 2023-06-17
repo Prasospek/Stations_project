@@ -220,8 +220,6 @@ export const deleteTrainLine = async (req, res) => {
             return res.status(404).json({ error: "TrainLine not found !" });
         }
 
-        //  // Remove the reference to the deleted TrainLine ??? TODO ???
-
         res.status(204).json(deletedTrainLine);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -235,7 +233,7 @@ export const createTrainLine = async (req, res) => {
         if (!stations) {
             return res
                 .status(400)
-                .json({ message: "Couldnt find user! stations function " });
+                .json({ message: "Couldnt find Station! stations function " });
         }
         const newTrainLine = new TrainLine({
             name,

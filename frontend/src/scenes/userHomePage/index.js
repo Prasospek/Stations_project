@@ -118,7 +118,7 @@ const UserHomePage = () => {
                         }}
                     >
                         <img
-                            src={`${process.env.PUBLIC_URL}/assets/Train_structure.jpg`}
+                            src={`${process.env.PUBLIC_URL}/assets/Train_structure.png`}
                             alt="Routes Image"
                             style={{
                                 maxWidth: "100%",

@@ -28,4 +28,3 @@ Implementujte systém pro podzemní dopravu na Marsu.
 <li>Osobní obhajoba projektu ve zkouškovém před nebo po zkoušce. ✅</li>
 </ul>
 
-<img src="https://ctrlv.cz/shots/2023/06/05/hZZv.png" alt="Image Description">
