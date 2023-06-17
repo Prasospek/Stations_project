@@ -1,3 +1,6 @@
+import TrainLine from "../models/TrainLine.js";
+import Station from "../models/Station.js";
+
 // A* algorithm implementation
 export async function calculateShortestRoute(
     startStationId,
@@ -156,6 +159,14 @@ export async function findPath(req, res) {
 
 export const getTrainLine = async (req, res) => {
     try {
+        const { id } = req.params;
+        const trainLine = await TrainLine.findById(id);
+
+        if (!trainLine) {
+            return res.status(404).json({ error: "TrainLine not found !" });
+        }
+
+        res.status(200).json(trainLine);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -163,6 +174,9 @@ export const getTrainLine = async (req, res) => {
 
 export const getTrainLines = async (req, res) => {
     try {
+        const trainLines = await TrainLine.find();
+
+        res.status(200).json(trainLines);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -170,6 +184,28 @@ export const getTrainLines = async (req, res) => {
 
 export const updateTrainLine = async (req, res) => {
     try {
+        const { id } = req.params;
+        const { name, stations, status, time } = req.body;
+
+        const updatedTrainLine = await TrainLine.findByIdAndUpdate(
+            id,
+            {
+                name,
+                stations,
+                status,
+                time,
+            },
+            { new: true }
+        );
+
+        if (!updatedTrainLine) {
+            return res.status(404).json({ error: "TrainLine not found !" });
+        }
+
+        res.status(200).json({
+            message: "Ticket updated successfully",
+            updateTrainLine,
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -177,6 +213,16 @@ export const updateTrainLine = async (req, res) => {
 
 export const deleteTrainLine = async (req, res) => {
     try {
+        const { id } = req.params;
+        const deletedTrainLine = await TrainLine.findByIdAndDelete(id);
+
+        if (!deletedTrainLine) {
+            return res.status(404).json({ error: "TrainLine not found !" });
+        }
+
+        //  // Remove the reference to the deleted TrainLine ??? TODO ???
+
+        res.status(204).json(deletedTrainLine);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -184,6 +230,29 @@ export const deleteTrainLine = async (req, res) => {
 
 export const createTrainLine = async (req, res) => {
     try {
+        const { name, stations, status, time } = req.body;
+
+        if (!stations) {
+            return res
+                .status(400)
+                .json({ message: "Couldnt find user! stations function " });
+        }
+        const newTrainLine = new TrainLine({
+            name,
+            stations,
+            status,
+            time,
+        });
+
+        // automatic pushes into the array of sstations
+        // const station = await Station.findOneAndUpdate(
+        //     { _id: passenger_id },
+        //     { $push: { tickets: newTicket._id } }
+        // );
+
+        await newTrainLine.save();
+
+        res.status(201).json(newTrainLine);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
