@@ -55,8 +55,13 @@ const TechnicianHomePage = () => {
 
             await Promise.all(
                 trainLines.map(async (trainLine) => {
-                    const name = await fetchStationName(trainLine.station_id);
-                    stationNamesMap[trainLine.station_id] = name;
+                    const stationNames = await Promise.all(
+                        trainLine.stations.map(async (stationId) => {
+                            const name = await fetchStationName(stationId);
+                            return name;
+                        })
+                    );
+                    stationNamesMap[trainLine._id] = stationNames;
                 })
             );
             setStationNames(stationNamesMap);
@@ -116,7 +121,10 @@ const TechnicianHomePage = () => {
                                     fontSize: "15px",
                                 }}
                             >
-                                <b>Stations: {trainLine.stations}</b>{" "}
+                                <b>
+                                    Stations:{" "}
+                                    {stationNames[trainLine._id]?.join(", ")}
+                                </b>
                             </p>
                         )}
                         <p

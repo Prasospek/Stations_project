@@ -46,6 +46,7 @@ const TechnicianHomePage = () => {
 
         fetchTrainLines();
     }, []);
+    // adding [] so it doesnt fetch 24/7 but only when changed
 
     const [stationNames, setStationNames] = useState({});
 
@@ -66,7 +67,6 @@ const TechnicianHomePage = () => {
             );
             setStationNames(stationNamesMap);
         };
-
         fetchAllStationNames();
     }, [trainLines]);
 
