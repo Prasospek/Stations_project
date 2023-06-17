@@ -11,8 +11,9 @@ import {
 const router = express.Router();
 
 /* POST */
-router.post("/", findPath); // vyhledání nejkratší trasy mezi dvěma stanicemi
-router.post("", createTrainLine);
+// Do jake routy dat findPath?
+//router.post("/", findPath); // vyhledání nejkratší trasy mezi dvěma stanicemi
+router.post("/", createTrainLine);
 
 /* GET */
 router.get("/:id", getTrainLine);
