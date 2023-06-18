@@ -213,6 +213,20 @@ const AdminPage = () => {
 
     return (
         <div>
+            <Button
+                variant="contained"
+                style={{
+                    width: "45%",
+                    display: "flex",
+                    margin: "auto",
+                    marginBottom: "1rem", // Add margin-bottom
+                    marginTop: "1rem", // Add margin-bottom
+                }}
+            >
+                Users
+            </Button>
+
+            <div style={{ width: "100%" }}></div>
             <ToastContainer />
             <div
                 style={{
@@ -385,12 +399,20 @@ const AdminPage = () => {
                     </Box>
                 ))}
 
-                <Button
-                    variant="contained"
-                    style={{ marginTop: "2rem", marginBottom: "1rem" }}
-                >
-                    Total Tickets: {totalTickets}
-                </Button>
+                <div style={{ width: "100%" }}>
+                    <Button
+                        variant="contained"
+                        style={{
+                            width: "45%",
+                            display: "flex",
+                            margin: "auto",
+                            marginBottom: "1rem", // Add margin-bottom
+                            marginTop: "1rem", // Add margin-bottom
+                        }}
+                    >
+                        Total Tickets: {totalTickets}
+                    </Button>
+                </div>
                 {tickets.map((ticket) => (
                     <Box
                         key={ticket._id}
