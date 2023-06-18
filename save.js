@@ -1,186 +1,127 @@
 import React, { useEffect, useState } from "react";
 import {
     Box,
-    Typography,
-    useMediaQuery,
     useTheme,
     IconButton,
+    useMediaQuery,
+    Typography,
     Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
+import * as yup from "yup";
 
-const TechnicianHomePage = () => {
+const registerSchema = yup.object().shape({
+    firstName: yup
+        .string()
+        .min(2, "FirstName must be at least 2 characters a-Z0-9")
+        .required("required and must be at least 2 characters a-Z0-9"),
+    lastName: yup
+        .string()
+        .min(2, " Lastname must be at least 2 characters a-Z0-9")
+        .required("required and must be at least 2 characters a-Z0-9"),
+    email: yup
+        .string()
+        .email("Email must contain @ followed by .com .cz etc (test@test.com)")
+        .required("required"),
+    password: yup
+        .string()
+        .min(5, "Password must be at least 5 characters")
+        .required("required"),
+});
+
+const AdminPage = () => {
     const { palette } = useTheme();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const isNonMobile = useMediaQuery("(min-width:800px)");
-    const isSmallScreen = useMediaQuery("(max-width:600px)");
+    const user = useSelector((state) => state.user);
+    const isMobile = useMediaQuery("(max-width:800px)");
 
-    const [trainLines, setTrainLines] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState("");
-    const [selectedTrainLineId, setSelectedTrainLineId] = useState(null); // New state for selected train line ID
-    const [time, setTime] = useState("");
+    const [users, setUsers] = useState([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedUser, setEditedUser] = useState({});
 
-    const fetchStationName = async (stationId) => {
+    const [totalTickets, setTotalTickets] = useState(0);
+
+    const fetchUsers = async () => {
         try {
-            const response = await fetch(
-                `http://localhost:8001/stations/${stationId}`
-            );
-            const data = await response.json();
-            return data.name;
+            const response = await axios.get("http://localhost:8001/users");
+            const data = response.data;
+            setUsers(data);
         } catch (error) {
-            console.error("Error fetching station:", error);
-            return null;
+            console.error("Error fetching users:", error);
+        }
+    };
+
+    const fetchTotalTickets = async () => {
+        try {
+            const response = await axios.get(
+                "http://localhost:8001/tickets/count"
+            );
+            const count = response.data.count;
+            setTotalTickets(count);
+            console.log(count);
+        } catch (error) {
+            console.error("Error fetching total tickets:", error);
         }
     };
 
     useEffect(() => {
-        const fetchTrainLines = async () => {
-            try {
-                const response = await fetch(
-                    "http://localhost:8001/trainlines"
-                );
-                const data = await response.json();
-                setTrainLines(data);
-                setLoading(false);
-                console.log(data);
-            } catch (error) {
-                console.error("Error fetching stations:", error);
-                setError("Failed to fetch stations");
-                setLoading(false);
-            }
-        };
-
-        fetchTrainLines();
+        fetchUsers();
+        fetchTotalTickets();
     }, []);
-    // adding [] so it doesn't fetch 24/7 but only when changed
 
-    const [stationNames, setStationNames] = useState({});
+    const handleRemoveUser = async (userId) => {
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this user?"
+        );
 
-    useEffect(() => {
-        const fetchAllStationNames = async () => {
-            const stationNamesMap = {};
-
-            await Promise.all(
-                trainLines.map(async (trainLine) => {
-                    const stationNames = await Promise.all(
-                        trainLine.stations.map(async (stationId) => {
-                            const name = await fetchStationName(stationId);
-                            return name;
-                        })
-                    );
-                    stationNamesMap[trainLine._id] = stationNames;
-                })
-            );
-            setStationNames(stationNamesMap);
-        };
-        fetchAllStationNames();
-    }, [trainLines]);
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
-
-    const handleUpdater = (trainLineId) => {
-        setSelectedTrainLineId(trainLineId); // Store the selected train line ID
-        setDialogOpen(true);
+        if (confirmed) {
+            try {
+                await axios.delete(`http://localhost:8001/users/${userId}`);
+                // Remove the deleted user from the users state
+                setUsers((prevUsers) =>
+                    prevUsers.filter((user) => user._id !== userId)
+                );
+                console.log(`Removing user with ID: ${userId}`);
+                toast.success(`User deleted successfully!`);
+            } catch (error) {
+                console.error("Error removing user:", error);
+                toast.error("Error, there was a mistake!");
+            }
+        }
     };
 
-    const handleDialogClose = () => {
-        setDialogOpen(false);
+    const handleUpdateUser = (user) => {
+        setIsEditing(true);
+        setEditedUser(user);
     };
 
-    // ...
-
-    const handleOptionSelect = async (option) => {
+    const handleSaveChanges = async () => {
         try {
-            setSelectedOption(option);
-            setDialogOpen(false); // Close the dialog
-
-            if (option === "maintenance") {
-                const inputTime = prompt("Enter maintenance time:");
-                if (inputTime === null) {
-                    // User clicked cancel
-                    return;
-                }
-                if (!inputTime.trim()) {
-                    // Empty input
-                    toast.error("Invalid maintenance time");
-                    return;
-                }
-
-                const maintenanceTime = parseInt(inputTime, 10);
-                if (isNaN(maintenanceTime)) {
-                    // Invalid input
-                    toast.error("Invalid maintenance time");
-                    return;
-                }
-
-                const originalTime = parseInt(
-                    trainLines.find(
-                        (trainLine) => trainLine._id === selectedTrainLineId
-                    ).time,
-                    10
-                );
-                if (isNaN(originalTime)) {
-                    // Invalid original time
-                    toast.error("Invalid original time");
-                    return;
-                }
-
-                const updatedTime = originalTime + maintenanceTime;
-
-                // Update the train line with the selected option and updated time
-                const updatedTrainLines = trainLines.map((trainLine) => {
-                    if (trainLine._id === selectedTrainLineId) {
-                        return {
-                            ...trainLine,
-                            status: option,
-                            time: updatedTime.toString(),
-                        };
-                    }
-                    return trainLine;
-                });
-                setTrainLines(updatedTrainLines); // Update the train lines with the updated status and time
-
-                toast.success("Changes saved successfully!");
-
+            const confirmed = window.confirm(
+                "Do you want to save the changes you made?"
+            );
+            if (confirmed) {
+                await registerSchema.validate(editedUser); // Validate the editedUser object
+                // If validation passes, proceed with saving changes
                 await axios.put(
-                    `http://localhost:8001/trainlines/${selectedTrainLineId}`,
-                    { status: option, time: updatedTime.toString() }
+                    `http://localhost:8001/users/${editedUser._id}`,
+                    editedUser
                 );
-            } else {
-                // Update the train line with the selected option
-                const updatedTrainLines = trainLines.map((trainLine) => {
-                    if (trainLine._id === selectedTrainLineId) {
-                        return { ...trainLine, status: option };
-                    }
-                    return trainLine;
-                });
-                setTrainLines(updatedTrainLines); // Update the train lines with the updated status
-
+                // Update the user in the users state
+                setUsers((prevUsers) =>
+                    prevUsers.map((user) =>
+                        user._id === editedUser._id ? editedUser : user
+                    )
+                );
+                setIsEditing(false);
                 toast.success("Changes saved successfully!");
-
-                await axios.put(
-                    `http://localhost:8001/trainlines/${selectedTrainLineId}`,
-                    { status: option }
-                );
             }
         } catch (error) {
             console.error("Error saving changes:", error);
@@ -188,128 +129,207 @@ const TechnicianHomePage = () => {
         }
     };
 
-    // ...
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditedUser({});
+    };
 
+    const handleShowAllTickets = async () => {
+        try {
+            const response = await axios.get("http://localhost:8001/tickets");
+            const tickets = response.data;
+            console.log(tickets);
+        } catch (error) {
+            console.error("Error fetching tickets:", error);
+        }
+    };
     return (
         <div>
-            <Box
-                p={2}
-                display="flex"
-                flexDirection={isSmallScreen ? "column" : "row"}
-                flexWrap="wrap"
+            <ToastContainer />
+            <div
+                style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "space-between",
+                    marginLeft: "3rem",
+                    marginRight: "3rem",
+                    marginTop: "2rem",
+                }}
             >
-                {trainLines.map((trainLine, index) => (
+                {users.map((user) => (
                     <Box
-                        key={trainLine._id}
-                        style={{
-                            backgroundColor: palette.primary.main,
-                            color: palette.primary.contrastText,
-                            marginBottom: "14px",
-                            padding: "0 14px 14px",
-                            borderRadius: "8px",
-                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                            width: isNonMobile ? "calc(50% - 15px)" : "100%",
-                            marginRight:
-                                isNonMobile && index % 2 === 0 ? "15px" : "0",
-                        }}
+                        key={user._id}
+                        bgcolor={palette.primary.main}
+                        color={palette.background.alt}
+                        padding="1rem"
+                        marginBottom="1rem"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        borderRadius="4px"
+                        width={isMobile ? "100%" : "45%"}
                     >
-                        <h2
-                            style={{
-                                fontSize: "27px",
-                                marginBottom: "4px",
-                                fontFamily: "Arial, sans-serif",
-                                fontWeight: "bold",
-                                textTransform: "uppercase",
-                            }}
-                        >
-                            {trainLine.name}
-                        </h2>
+                        {isEditing && editedUser._id === user._id ? (
+                            <div>
+                                <Typography variant="h6">
+                                    Editing User:
+                                </Typography>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        First Name:
+                                    </Typography>
+                                    <input
+                                        type="text"
+                                        value={editedUser.firstName}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                firstName: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Last Name:
+                                    </Typography>
+                                    <input
+                                        type="text"
+                                        value={editedUser.lastName}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                lastName: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Email:
+                                    </Typography>
+                                    <input
+                                        type="email"
+                                        value={editedUser.email}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                email: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem">
+                                    <Typography variant="body1">
+                                        Password:
+                                    </Typography>
+                                    <input
+                                        type="password"
+                                        value={editedUser.password}
+                                        onChange={(e) =>
+                                            setEditedUser({
+                                                ...editedUser,
+                                                password: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Box>
+                                <Box marginTop="1rem" display="flex">
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleSaveChanges}
+                                        sx={{ marginRight: "1rem" }}
+                                    >
+                                        Save
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleCancelEdit}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Box>
+                            </div>
+                        ) : (
+                            <div>
+                                <Typography
+                                    variant="h3"
+                                    gutterBottom
+                                    fontSize={"1.5rem"}
+                                >
+                                    {`${user.firstName} ${user.lastName}`}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>First Name:</strong>{" "}
+                                    {user.firstName}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Last Name:</strong> {user.lastName}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Email:</strong> {user.email}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    style={{ wordBreak: "break-word" }}
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Password:</strong> {user.password}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Role:</strong> {user.role}
+                                </Typography>
 
-                        {trainLine.stations && (
-                            <p
-                                style={{
-                                    marginBottom: "4px",
-                                    fontFamily: "Arial, sans-serif",
-                                    fontSize: "15px",
-                                }}
-                            >
-                                <b>Stations: </b>
-                                {stationNames[trainLine._id]?.join(", ")}
-                            </p>
+                                <Box marginTop="1rem" display="flex">
+                                    <IconButton
+                                        color="inherit"
+                                        onClick={() =>
+                                            handleRemoveUser(user._id)
+                                        }
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        color="inherit"
+                                        onClick={() => handleUpdateUser(user)}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                </Box>
+                            </div>
                         )}
-                        <p
-                            style={{
-                                marginBottom: "4px",
-                                fontFamily: "Arial, sans-serif",
-                                fontSize: "15px",
-                                color:
-                                    trainLine.status === "disruption"
-                                        ? "red"
-                                        : trainLine.status === "operational"
-                                        ? "green"
-                                        : "yellow",
-                            }}
-                        >
-                            <b>Status: </b>
-
-                            {trainLine.status}
-                        </p>
-                        <p
-                            style={{
-                                marginBottom: "4px",
-                                fontFamily: "Arial, sans-serif",
-                                fontSize: "15px",
-                            }}
-                        >
-                            <b>Time: </b>
-                            {trainLine.status === "disruption"
-                                ? `(${trainLine.time})`
-                                : trainLine.time}
-                        </p>
-                        <Box display="flex" justifyContent="left" mt={2}>
-                            <IconButton
-                                onClick={() => handleUpdater(trainLine._id)}
-                            >
-                                <EditIcon />
-                            </IconButton>
-                        </Box>
                     </Box>
                 ))}
-            </Box>
-
-            <Dialog open={dialogOpen} onClose={handleDialogClose}>
-                <DialogTitle>Select Status</DialogTitle>
-                <DialogContent>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => handleOptionSelect("operational")}
-                        style={{ marginRight: "10px" }}
-                    >
-                        Operational
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => handleOptionSelect("disruption")}
-                        style={{ marginRight: "10px" }}
-                    >
-                        Disruption
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => handleOptionSelect("maintenance")}
-                    >
-                        Maintenance
-                    </Button>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDialogClose}>Cancel</Button>
-                </DialogActions>
-            </Dialog>
+                <Button
+                    variant="contained"
+                    onClick={handleShowAllTickets}
+                    style={{ marginTop: "2rem" }}
+                >
+                    Show All Tickets
+                </Button>
+                <Button variant="contained" style={{ marginTop: "2rem" }}>
+                    Total Tickets: {totalTickets}
+                </Button>
+            </div>
         </div>
     );
 };
 
-export default TechnicianHomePage;
+export default AdminPage;
