@@ -23,6 +23,10 @@ const trainLineSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        originalTime: {
+            type: Number,
+            required: true,
+        },
     },
     { timestamps: true }
 );

@@ -185,7 +185,7 @@ export const getTrainLines = async (req, res) => {
 export const updateTrainLine = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, stations, status, time } = req.body;
+        const { name, stations, status, time, originalTime } = req.body;
 
         const updatedTrainLine = await TrainLine.findByIdAndUpdate(
             id,
@@ -194,6 +194,7 @@ export const updateTrainLine = async (req, res) => {
                 stations,
                 status,
                 time,
+                originalTime,
             },
             { new: true }
         );
@@ -202,10 +203,7 @@ export const updateTrainLine = async (req, res) => {
             return res.status(404).json({ error: "TrainLine not found !" });
         }
 
-        res.status(200).json({
-            message: "Ticket updated successfully",
-            updateTrainLine,
-        });
+        res.status(200).json(updatedTrainLine);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -228,7 +226,7 @@ export const deleteTrainLine = async (req, res) => {
 
 export const createTrainLine = async (req, res) => {
     try {
-        const { name, stations, status, time } = req.body;
+        const { name, stations, status, time, originalTime } = req.body;
 
         if (!stations) {
             return res
@@ -240,6 +238,7 @@ export const createTrainLine = async (req, res) => {
             stations,
             status,
             time,
+            originalTime,
         });
 
         // automatic pushes into the array of sstations

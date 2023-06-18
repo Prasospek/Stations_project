@@ -32,6 +32,7 @@ const TechnicianHomePage = () => {
     const [selectedOption, setSelectedOption] = useState("");
     const [selectedTrainLineId, setSelectedTrainLineId] = useState(null); // New state for selected train line ID
     const [time, setTime] = useState("");
+    const [originalTime, setOriginalTime] = useState(0);
 
     const fetchStationName = async (stationId) => {
         try {
@@ -53,6 +54,7 @@ const TechnicianHomePage = () => {
                     "http://localhost:8001/trainlines"
                 );
                 const data = await response.json();
+
                 setTrainLines(data);
                 setLoading(false);
                 console.log(data);
@@ -99,6 +101,15 @@ const TechnicianHomePage = () => {
 
     const handleUpdater = (trainLineId) => {
         setSelectedTrainLineId(trainLineId); // Store the selected train line ID
+
+        setOriginalTime(
+            parseInt(
+                trainLines.find((trainLine) => trainLine._id === trainLineId)
+                    .time,
+                10
+            )
+        );
+
         setDialogOpen(true);
     };
 
@@ -106,7 +117,19 @@ const TechnicianHomePage = () => {
         setDialogOpen(false);
     };
 
-    // ...
+    const handleResetTime = (trainLineId) => {
+        const updatedTrainLines = trainLines.map((trainLine) => {
+            if (trainLine._id === trainLineId) {
+                return {
+                    ...trainLine,
+                    time: trainLine.originalTime.toString(), // Reset the time to originalTime
+                    status: "operational", // Set the status to "operational"
+                };
+            }
+            return trainLine;
+        });
+        setTrainLines(updatedTrainLines); // Update the train lines with the reset time and status
+    };
 
     const handleOptionSelect = async (option) => {
         try {
@@ -188,8 +211,6 @@ const TechnicianHomePage = () => {
         }
     };
 
-    // ...
-
     return (
         <div>
             <Box
@@ -211,6 +232,9 @@ const TechnicianHomePage = () => {
                             width: isNonMobile ? "calc(50% - 15px)" : "100%",
                             marginRight:
                                 isNonMobile && index % 2 === 0 ? "15px" : "0",
+                            display: "flex", // Added display property
+                            flexDirection: "column", // Changed flex direction to column
+                            alignItems: "flex-start", // Aligned items to start
                         }}
                     >
                         <h2
@@ -251,7 +275,6 @@ const TechnicianHomePage = () => {
                             }}
                         >
                             <b>Status: </b>
-
                             {trainLine.status}
                         </p>
                         <p
@@ -272,6 +295,18 @@ const TechnicianHomePage = () => {
                             >
                                 <EditIcon />
                             </IconButton>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={() => handleResetTime(trainLine._id)} // Pass the train line ID
+                                style={{
+                                    marginLeft: "10px",
+                                    color: "purple",
+                                    backgroundColor: "white",
+                                }}
+                            >
+                                Reset Time & Status
+                            </Button>
                         </Box>
                     </Box>
                 ))}
