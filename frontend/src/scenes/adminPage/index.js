@@ -46,6 +46,8 @@ const AdminPage = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedUser, setEditedUser] = useState({});
 
+    const [totalTickets, setTotalTickets] = useState(0);
+
     const fetchUsers = async () => {
         try {
             const response = await axios.get("http://localhost:8001/users");
@@ -56,8 +58,22 @@ const AdminPage = () => {
         }
     };
 
+    const fetchTotalTickets = async () => {
+        try {
+            const response = await axios.get(
+                "http://localhost:8001/tickets/count"
+            );
+            const count = response.data.count;
+            setTotalTickets(count);
+            console.log();
+        } catch (error) {
+            console.error("Error fetching total tickets:", error);
+        }
+    };
+
     useEffect(() => {
         fetchUsers();
+        fetchTotalTickets();
     }, []);
 
     const handleRemoveUser = async (userId) => {
@@ -131,6 +147,7 @@ const AdminPage = () => {
                     marginTop: "2rem",
                 }}
             >
+
                 {users.map((user) => (
                     <Box
                         key={user._id}

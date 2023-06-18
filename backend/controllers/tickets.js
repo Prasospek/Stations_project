@@ -26,6 +26,17 @@ export const getTickets = async (req, res) => {
     }
 };
 
+export const getCount = async (req, res) => {
+    try {
+        const tickets = await Ticket.find();
+        const count = tickets.length;
+
+        res.status(200).json({ count });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 export const createTicket = async (req, res) => {
     try {
         const { station_id, purchase_method, destination_id, passenger_id } =

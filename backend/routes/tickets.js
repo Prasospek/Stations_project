@@ -6,14 +6,16 @@ import {
     createTicket,
     updateTicket,
     deleteTicket,
+    getCount,
 } from "../controllers/tickets.js";
 
 const router = express.Router();
 
 /*GET */
 router.get("/", getTickets); // Ziskani vsech jizdenek
-router.get("/:id", getTicket); // Ziskani specifické jizdenky
+router.get("/count", getCount); // Ziskani vsech jizdenek
 
+router.get("/:id", getTicket); // Ziskani specifické jizdenky
 /* POST */
 router.post("/", createTicket); // Vytvoreni nove jizdenky
 
