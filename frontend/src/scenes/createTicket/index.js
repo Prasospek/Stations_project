@@ -247,6 +247,7 @@ const CreateTicketForm = () => {
                                     disabled={isSubmitting}
                                     sx={{
                                         marginTop: "1rem",
+                                        padding: "0.9rem",
                                     }}
                                 >
                                     Create Ticket
@@ -254,23 +255,15 @@ const CreateTicketForm = () => {
                             </form>
                         )}
                     </Formik>
-                    <Button
-                        variant="contained"
-                        onClick={handleRetrieveIds}
-                        sx={{
-                            marginTop: "2rem",
-                            marginLeft: "20rem",
-                        }}
-                    >
-                        Retrieve Station ID and Destination ID
-                    </Button>
 
                     <Button
                         variant="contained"
                         onClick={handleShowShortestPath}
                         sx={{
-                            marginTop: "2rem",
-                            marginLeft: "20rem",
+                            marginTop: isNonMobile ? "-4rem" : "1rem",
+                            marginLeft: isNonMobile ? "35rem" : "0",
+                            width: isNonMobile ? undefined : "100%",
+                            padding: "0.9rem",
                         }}
                     >
                         Show Shortest Path
