@@ -1,5 +1,6 @@
 import TrainLine from "../models/TrainLine.js";
 import Station from "../models/Station.js";
+import axios from "axios";
 
 class Graph {
     constructor() {
@@ -13,8 +14,8 @@ class Graph {
         if (!this.vertices.has(target)) {
             this.vertices.set(target, []);
         }
-        this.vertices.get(source).push({ target, weight });
-        this.vertices.get(target).push({ target: source, weight });
+        this.vertices.get(source).push({ target: target, weight: weight });
+        this.vertices.get(target).push({ target: source, weight: weight });
     }
 
     shortestPath(source, target) {
@@ -96,110 +97,41 @@ class PriorityQueue {
 }
 
 export const findShortestPath = async (sourceStationId, targetStationId) => {
-    const trainLines = [
-        {
-            _id: "648de90d92659667578bae77",
-            name: "St1-St3",
-            stations: ["6485f933e63353dd9f5c4a85", "6485f948e63353dd9f5c4a89"],
-            status: "maintenance",
-            time: 30,
-            createdAt: "2023-06-17T17:10:37.110Z",
-            updatedAt: "2023-06-18T17:27:48.833Z",
-            __v: 0,
-            originalTime: 10,
-        },
-        {
-            _id: "648de97392659667578bae7b",
-            name: "St4-St2",
-            stations: ["6485f94ce63353dd9f5c4a8b", "6485f944e63353dd9f5c4a87"],
-            status: "maintenance",
-            time: 27,
-            createdAt: "2023-06-17T17:12:19.249Z",
-            updatedAt: "2023-06-18T14:14:47.209Z",
-            __v: 0,
-            originalTime: 2,
-        },
-        {
-            _id: "648de99892659667578bae7d",
-            name: "St2-St5",
-            stations: ["6485f944e63353dd9f5c4a87", "6485f94fe63353dd9f5c4a8d"],
-            status: "operational",
-            time: 7,
-            createdAt: "2023-06-17T17:12:56.614Z",
-            updatedAt: "2023-06-18T13:42:56.713Z",
-            __v: 0,
-            originalTime: 7,
-        },
-        {
-            _id: "648de9be92659667578bae7f",
-            name: "St5-St6",
-            stations: ["6485f94fe63353dd9f5c4a8d", "6485f951e63353dd9f5c4a8f"],
-            status: "operational",
-            time: 8,
-            createdAt: "2023-06-17T17:13:34.834Z",
-            updatedAt: "2023-06-18T13:43:31.878Z",
-            __v: 0,
-            originalTime: 8,
-        },
-        {
-            _id: "648de9fb92659667578bae81",
-            name: "St4-St6",
-            stations: ["6485f94ce63353dd9f5c4a8b", "6485f951e63353dd9f5c4a8f"],
-            status: "operational",
-            time: 17,
-            createdAt: "2023-06-17T17:14:35.139Z",
-            updatedAt: "2023-06-18T13:44:11.277Z",
-            __v: 0,
-            originalTime: 17,
-        },
-        {
-            _id: "648dea1a92659667578bae83",
-            name: "St6-St7",
-            stations: ["6485f951e63353dd9f5c4a8f", "6485f956e63353dd9f5c4a91"],
-            status: "operational",
-            time: 10,
-            createdAt: "2023-06-17T17:15:06.380Z",
-            updatedAt: "2023-06-18T13:44:46.087Z",
-            __v: 0,
-            originalTime: 10,
-        },
-        {
-            _id: "648e4dc2398d8fd81e03d788",
-            name: "St3-St4",
-            stations: ["6485f948e63353dd9f5c4a89", "6485f94ce63353dd9f5c4a8b"],
-            status: "operational",
-            time: 5,
-            createdAt: "2023-06-18T00:20:18.783Z",
-            updatedAt: "2023-06-18T13:45:26.583Z",
-            __v: 0,
-            originalTime: 5,
-        },
-    ];
+    try {
+        const response = await axios.get("http://localhost:8001/trainlines");
+        const trainLines = response.data;
 
-    const stationMap = new Map();
-    trainLines.forEach((line) => {
-        const stations = line.stations;
-        for (let i = 0; i < stations.length; i++) {
-            const stationId = stations[i];
-            if (!stationMap.has(stationId)) {
-                stationMap.set(stationId, { line: line.name, index: i });
+        const stationMap = new Map();
+        trainLines.forEach((line) => {
+            const stations = line.stations;
+            for (let i = 0; i < stations.length; i++) {
+                const stationId = stations[i];
+                if (!stationMap.has(stationId)) {
+                    stationMap.set(stationId, { line: line.name, index: i });
+                }
             }
-        }
-    });
+        });
 
-    const graph = new Graph();
-    trainLines.forEach((line) => {
-        const stations = line.stations;
-        for (let i = 0; i < stations.length - 1; i++) {
-            const sourceStationId = stations[i];
-            const targetStationId = stations[i + 1];
-            const weight = line.time;
-            graph.addEdge(sourceStationId, targetStationId, weight);
-        }
-    });
+        const graph = new Graph();
+        trainLines.forEach((line) => {
+            const stations = line.stations;
+            for (let i = 0; i < stations.length - 1; i++) {
+                const sourceStationId = stations[i];
+                const targetStationId = stations[i + 1];
+                const weight = line.time; // Corrected here
+                graph.addEdge(sourceStationId, targetStationId, weight);
+            }
+        });
 
-    const shortestPath = graph.shortestPath(sourceStationId, targetStationId);
-    return shortestPath;
+        const shortestPath = graph.shortestPath(
+            sourceStationId,
+            targetStationId
+        );
+        return shortestPath;
+    } catch (error) {
+        console.error("Error fetching trainLines:", error);
+        return null;
+    }
 };
 
 export const getTrainLine = async (req, res) => {
