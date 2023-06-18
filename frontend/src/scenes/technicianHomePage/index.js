@@ -118,17 +118,23 @@ const TechnicianHomePage = () => {
     };
 
     const handleResetTime = (trainLineId) => {
-        const updatedTrainLines = trainLines.map((trainLine) => {
-            if (trainLine._id === trainLineId) {
-                return {
-                    ...trainLine,
-                    time: trainLine.originalTime.toString(), // Reset the time to originalTime
-                    status: "operational", // Set the status to "operational"
-                };
-            }
-            return trainLine;
-        });
-        setTrainLines(updatedTrainLines); // Update the train lines with the reset time and status
+        const confirmReset = window.confirm(
+            "Are you sure you want to reset the time and status?"
+        );
+
+        if (confirmReset) {
+            const updatedTrainLines = trainLines.map((trainLine) => {
+                if (trainLine._id === trainLineId) {
+                    return {
+                        ...trainLine,
+                        time: trainLine.originalTime.toString(), // Reset the time to originalTime
+                        status: "operational", // Set the status to "operational"
+                    };
+                }
+                return trainLine;
+            });
+            setTrainLines(updatedTrainLines); // Update the train lines with the reset time and status
+        }
     };
 
     const handleOptionSelect = async (option) => {
