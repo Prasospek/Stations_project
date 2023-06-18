@@ -185,7 +185,7 @@ const Tickets = () => {
                         textAlign: "center",
                     }}
                 >
-                    <Typography
+                    <Typography 
                         variant="h2"
                         sx={{
                             margin: "0 0 10px",
@@ -203,7 +203,9 @@ const Tickets = () => {
                 </Box>
             )}
 
-            <Footer />
+            <Box sx={{ marginTop: "3rem" }}>
+                <Footer />
+            </Box>
         </div>
     );
 };

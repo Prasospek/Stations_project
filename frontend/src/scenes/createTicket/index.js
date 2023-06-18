@@ -49,6 +49,9 @@ const CreateTicketForm = () => {
     const [stations, setStations] = useState([]);
     const userId = useSelector((state) => state.user._id);
     const navigate = useNavigate();
+    const [shortestPath, setShortestPath] = useState([]);
+    const [selectedStationId, setSelectedStationId] = useState("");
+    const [selectedDestinationId, setSelectedDestinationId] = useState("");
 
     useEffect(() => {
         fetchStations();
@@ -87,6 +90,36 @@ const CreateTicketForm = () => {
         }
     };
 
+    const handleRetrieveIds = () => {
+        console.log("Selected Station ID:", selectedStationId);
+        console.log("Selected Destination ID:", selectedDestinationId);
+    };
+
+    const handleShowShortestPath = async () => {
+        try {
+            // Make a request to fetch the shortest path
+            const response = await axios.get(
+                `http://localhost:8001/trainlines/shortest-path/${selectedStationId}/${selectedDestinationId}`
+            );
+
+            const shortestPathIds = response.data.shortestPath;
+
+            // Fetch station names based on the IDs
+            const shortestPathNames = await Promise.all(
+                shortestPathIds.map(async (stationId) => {
+                    const stationResponse = await axios.get(
+                        `http://localhost:8001/stations/${stationId}`
+                    );
+                    return stationResponse.data.name;
+                })
+            );
+
+            setShortestPath(shortestPathNames);
+        } catch (error) {
+            console.error("Error fetching shortest path:", error.message);
+        }
+    };
+
     return (
         <div>
             <Navbar />
@@ -96,7 +129,7 @@ const CreateTicketForm = () => {
                 alignItems="center"
                 height="45vh"
             >
-                <Box width="70%">
+                <Box width="70%" marginTop={"15rem"}>
                     <h2>Buy Ticket</h2>
                     <Formik
                         initialValues={initialTicketValues}
@@ -116,9 +149,15 @@ const CreateTicketForm = () => {
                                 <Box display="grid" gap="30px">
                                     <Select
                                         label="Station"
+                                        id="station_id"
                                         name="station_id"
                                         value={values.station_id}
-                                        onChange={handleChange}
+                                        onChange={(event) => {
+                                            handleChange(event);
+                                            setSelectedStationId(
+                                                event.target.value
+                                            );
+                                        }}
                                         onBlur={handleBlur}
                                         error={
                                             touched.station_id &&
@@ -172,7 +211,12 @@ const CreateTicketForm = () => {
                                         label="Destination"
                                         name="destination_id"
                                         value={values.destination_id}
-                                        onChange={handleChange}
+                                        onChange={(event) => {
+                                            handleChange(event);
+                                            setSelectedDestinationId(
+                                                event.target.value
+                                            );
+                                        }}
                                         onBlur={handleBlur}
                                         error={
                                             touched.destination_id &&
@@ -211,15 +255,32 @@ const CreateTicketForm = () => {
                         )}
                     </Formik>
                     <Button
-                        type="submit"
                         variant="contained"
+                        onClick={handleRetrieveIds}
                         sx={{
                             marginTop: "2rem",
                             marginLeft: "20rem",
                         }}
                     >
-                        Show shortest Path DO THIS!
+                        Retrieve Station ID and Destination ID
                     </Button>
+
+                    <Button
+                        variant="contained"
+                        onClick={handleShowShortestPath}
+                        sx={{
+                            marginTop: "2rem",
+                            marginLeft: "20rem",
+                        }}
+                    >
+                        Show Shortest Path
+                    </Button>
+
+                    {shortestPath.length > 0 && (
+                        <Box sx={{ marginTop: "1rem" }}>
+                            <h3>Shortest Path: {shortestPath.join(" -> ")}</h3>
+                        </Box>
+                    )}
                 </Box>
             </Box>
             <Footer />
