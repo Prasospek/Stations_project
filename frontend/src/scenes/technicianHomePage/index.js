@@ -31,6 +31,7 @@ const TechnicianHomePage = () => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState("");
     const [selectedTrainLineId, setSelectedTrainLineId] = useState(null); // New state for selected train line ID
+    const [time, setTime] = useState("");
 
     const fetchStationName = async (stationId) => {
         try {
@@ -105,23 +106,75 @@ const TechnicianHomePage = () => {
         setDialogOpen(false);
     };
 
+    // ...
+
     const handleOptionSelect = async (option) => {
         try {
             setSelectedOption(option);
             setDialogOpen(false); // Close the dialog
 
-            const confirmed = window.confirm(
-                "Do you want to save the changes you made?"
-            );
-            if (confirmed) {
+            if (option === "maintenance") {
+                const inputTime = prompt("Enter maintenance time:");
+                if (inputTime === null) {
+                    // User clicked cancel
+                    return;
+                }
+                if (!inputTime.trim()) {
+                    // Empty input
+                    toast.error("Invalid maintenance time");
+                    return;
+                }
+
+                const maintenanceTime = parseInt(inputTime, 10);
+                if (isNaN(maintenanceTime)) {
+                    // Invalid input
+                    toast.error("Invalid maintenance time");
+                    return;
+                }
+
+                const originalTime = parseInt(
+                    trainLines.find(
+                        (trainLine) => trainLine._id === selectedTrainLineId
+                    ).time,
+                    10
+                );
+                if (isNaN(originalTime)) {
+                    // Invalid original time
+                    toast.error("Invalid original time");
+                    return;
+                }
+
+                const updatedTime = originalTime + maintenanceTime;
+
+                // Update the train line with the selected option and updated time
+                const updatedTrainLines = trainLines.map((trainLine) => {
+                    if (trainLine._id === selectedTrainLineId) {
+                        return {
+                            ...trainLine,
+                            status: option,
+                            time: updatedTime.toString(),
+                        };
+                    }
+                    return trainLine;
+                });
+                setTrainLines(updatedTrainLines); // Update the train lines with the updated status and time
+
+                toast.success("Changes saved successfully!");
+
+                await axios.put(
+                    `http://localhost:8001/trainlines/${selectedTrainLineId}`,
+                    { status: option, time: updatedTime.toString() }
+                );
+            } else {
+                // Update the train line with the selected option
                 const updatedTrainLines = trainLines.map((trainLine) => {
                     if (trainLine._id === selectedTrainLineId) {
                         return { ...trainLine, status: option };
                     }
                     return trainLine;
                 });
-
                 setTrainLines(updatedTrainLines); // Update the train lines with the updated status
+
                 toast.success("Changes saved successfully!");
 
                 await axios.put(
@@ -134,6 +187,8 @@ const TechnicianHomePage = () => {
             toast.error(error.message);
         }
     };
+
+    // ...
 
     return (
         <div>
@@ -178,10 +233,8 @@ const TechnicianHomePage = () => {
                                     fontSize: "15px",
                                 }}
                             >
-                                <b>
-                                    Stations:{" "}
-                                    {stationNames[trainLine._id]?.join(", ")}
-                                </b>
+                                <b>Stations: </b>
+                                {stationNames[trainLine._id]?.join(", ")}
                             </p>
                         )}
                         <p
@@ -189,9 +242,16 @@ const TechnicianHomePage = () => {
                                 marginBottom: "4px",
                                 fontFamily: "Arial, sans-serif",
                                 fontSize: "15px",
+                                color:
+                                    trainLine.status === "disruption"
+                                        ? "red"
+                                        : trainLine.status === "operational"
+                                        ? "green"
+                                        : "yellow",
                             }}
                         >
                             <b>Status: </b>
+
                             {trainLine.status}
                         </p>
                         <p
@@ -202,7 +262,9 @@ const TechnicianHomePage = () => {
                             }}
                         >
                             <b>Time: </b>
-                            {trainLine.time}
+                            {trainLine.status === "disruption"
+                                ? `(${trainLine.time})`
+                                : trainLine.time}
                         </p>
                         <Box display="flex" justifyContent="left" mt={2}>
                             <IconButton

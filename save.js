@@ -1,7 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+    Box,
+    Typography,
+    useMediaQuery,
+    useTheme,
+    IconButton,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const TechnicianHomePage = () => {
     const { palette } = useTheme();
@@ -13,6 +28,10 @@ const TechnicianHomePage = () => {
     const [trainLines, setTrainLines] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedOption, setSelectedOption] = useState("");
+    const [selectedTrainLineId, setSelectedTrainLineId] = useState(null); // New state for selected train line ID
+    const [time, setTime] = useState("");
 
     const fetchStationName = async (stationId) => {
         try {
@@ -46,6 +65,7 @@ const TechnicianHomePage = () => {
 
         fetchTrainLines();
     }, []);
+    // adding [] so it doesn't fetch 24/7 but only when changed
 
     const [stationNames, setStationNames] = useState({});
 
@@ -66,7 +86,6 @@ const TechnicianHomePage = () => {
             );
             setStationNames(stationNamesMap);
         };
-
         fetchAllStationNames();
     }, [trainLines]);
 
@@ -77,6 +96,99 @@ const TechnicianHomePage = () => {
     if (error) {
         return <div>Error: {error}</div>;
     }
+
+    const handleUpdater = (trainLineId) => {
+        setSelectedTrainLineId(trainLineId); // Store the selected train line ID
+        setDialogOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+    };
+
+    // ...
+
+    const handleOptionSelect = async (option) => {
+        try {
+            setSelectedOption(option);
+            setDialogOpen(false); // Close the dialog
+
+            if (option === "maintenance") {
+                const inputTime = prompt("Enter maintenance time:");
+                if (inputTime === null) {
+                    // User clicked cancel
+                    return;
+                }
+                if (!inputTime.trim()) {
+                    // Empty input
+                    toast.error("Invalid maintenance time");
+                    return;
+                }
+
+                const maintenanceTime = parseInt(inputTime, 10);
+                if (isNaN(maintenanceTime)) {
+                    // Invalid input
+                    toast.error("Invalid maintenance time");
+                    return;
+                }
+
+                const originalTime = parseInt(
+                    trainLines.find(
+                        (trainLine) => trainLine._id === selectedTrainLineId
+                    ).time,
+                    10
+                );
+                if (isNaN(originalTime)) {
+                    // Invalid original time
+                    toast.error("Invalid original time");
+                    return;
+                }
+
+                const updatedTime = originalTime + maintenanceTime;
+
+                // Update the train line with the selected option and updated time
+                const updatedTrainLines = trainLines.map((trainLine) => {
+                    if (trainLine._id === selectedTrainLineId) {
+                        return {
+                            ...trainLine,
+                            status: option,
+                            time: updatedTime.toString(),
+                        };
+                    }
+                    return trainLine;
+                });
+                setTrainLines(updatedTrainLines); // Update the train lines with the updated status and time
+
+                toast.success("Changes saved successfully!");
+
+                await axios.put(
+                    `http://localhost:8001/trainlines/${selectedTrainLineId}`,
+                    { status: option, time: updatedTime.toString() }
+                );
+            } else {
+                // Update the train line with the selected option
+                const updatedTrainLines = trainLines.map((trainLine) => {
+                    if (trainLine._id === selectedTrainLineId) {
+                        return { ...trainLine, status: option };
+                    }
+                    return trainLine;
+                });
+                setTrainLines(updatedTrainLines); // Update the train lines with the updated status
+
+                toast.success("Changes saved successfully!");
+
+                await axios.put(
+                    `http://localhost:8001/trainlines/${selectedTrainLineId}`,
+                    { status: option }
+                );
+            }
+        } catch (error) {
+            console.error("Error saving changes:", error);
+            toast.error(error.message);
+        }
+    };
+
+    // ...
 
     return (
         <div>
@@ -121,10 +233,8 @@ const TechnicianHomePage = () => {
                                     fontSize: "15px",
                                 }}
                             >
-                                <b>
-                                    Stations:{" "}
-                                    {stationNames[trainLine._id]?.join(", ")}
-                                </b>
+                                <b>Stations: </b>
+                                {stationNames[trainLine._id]?.join(", ")}
                             </p>
                         )}
                         <p
@@ -132,9 +242,16 @@ const TechnicianHomePage = () => {
                                 marginBottom: "4px",
                                 fontFamily: "Arial, sans-serif",
                                 fontSize: "15px",
+                                color:
+                                    trainLine.status === "disruption"
+                                        ? "red"
+                                        : trainLine.status === "operational"
+                                        ? "green"
+                                        : "yellow",
                             }}
                         >
                             <b>Status: </b>
+
                             {trainLine.status}
                         </p>
                         <p
@@ -145,13 +262,52 @@ const TechnicianHomePage = () => {
                             }}
                         >
                             <b>Time: </b>
-                            {trainLine.time}
+                            {trainLine.status === "disruption"
+                                ? `(${trainLine.time})`
+                                : trainLine.time}
                         </p>
+                        <Box display="flex" justifyContent="left" mt={2}>
+                            <IconButton
+                                onClick={() => handleUpdater(trainLine._id)}
+                            >
+                                <EditIcon />
+                            </IconButton>
+                        </Box>
                     </Box>
                 ))}
             </Box>
 
-            <Box mb={5}></Box>
+            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+                <DialogTitle>Select Status</DialogTitle>
+                <DialogContent>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => handleOptionSelect("operational")}
+                        style={{ marginRight: "10px" }}
+                    >
+                        Operational
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => handleOptionSelect("disruption")}
+                        style={{ marginRight: "10px" }}
+                    >
+                        Disruption
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => handleOptionSelect("maintenance")}
+                    >
+                        Maintenance
+                    </Button>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogClose}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };
