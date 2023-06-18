@@ -1,335 +1,180 @@
-import React, { useEffect, useState } from "react";
-import {
-    Box,
-    useTheme,
-    IconButton,
-    useMediaQuery,
-    Typography,
-    Button,
-} from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import * as yup from "yup";
+import TrainLine from "../models/TrainLine.js";
+import Station from "../models/Station.js";
 
-const registerSchema = yup.object().shape({
-    firstName: yup
-        .string()
-        .min(2, "FirstName must be at least 2 characters a-Z0-9")
-        .required("required and must be at least 2 characters a-Z0-9"),
-    lastName: yup
-        .string()
-        .min(2, " Lastname must be at least 2 characters a-Z0-9")
-        .required("required and must be at least 2 characters a-Z0-9"),
-    email: yup
-        .string()
-        .email("Email must contain @ followed by .com .cz etc (test@test.com)")
-        .required("required"),
-    password: yup
-        .string()
-        .min(5, "Password must be at least 5 characters")
-        .required("required"),
-});
+export const findShortestPath = async (sourceStationId, targetStationId) => {
+    const trainLines = await TrainLine.find({}).populate("stations");
 
-const AdminPage = () => {
-    const { palette } = useTheme();
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const user = useSelector((state) => state.user);
-    const isMobile = useMediaQuery("(max-width:800px)");
+    // Create a map of station IDs to their corresponding train line and index
+    const stationMap = new Map();
+    trainLines.forEach((trainLine) => {
+        trainLine.stations.forEach((station, index) => {
+            stationMap.set(station._id.toString(), { trainLine, index });
+        });
+    });
 
-    const [users, setUsers] = useState([]);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedUser, setEditedUser] = useState({});
+    // Create a priority queue to store the nodes and their distances from the source station
+    const priorityQueue = new PriorityQueue();
 
-    const [totalTickets, setTotalTickets] = useState(0);
+    // Initialize the distances of all stations as Infinity except the source station
+    const distances = new Map();
+    trainLines.forEach((trainLine) => {
+        trainLine.stations.forEach((station) => {
+            distances.set(station._id.toString(), Infinity);
+        });
+    });
+    distances.set(sourceStationId.toString(), 0);
 
-    const fetchUsers = async () => {
-        try {
-            const response = await axios.get("http://localhost:8001/users");
-            const data = response.data;
-            setUsers(data);
-        } catch (error) {
-            console.error("Error fetching users:", error);
+    // Initialize the previous station map to store the previous station for each station
+    const previousStations = new Map();
+
+    // Add the source station to the priority queue
+    priorityQueue.enqueue(sourceStationId.toString(), 0);
+
+    while (!priorityQueue.isEmpty()) {
+        const currentStationId = priorityQueue.dequeue();
+        const currentDistance = distances.get(currentStationId);
+
+        if (currentStationId === targetStationId.toString()) {
+            // Reached the target station, stop the algorithm
+            break;
         }
-    };
 
-    const fetchTotalTickets = async () => {
-        try {
-            const response = await axios.get(
-                "http://localhost:8001/tickets/count"
-            );
-            const count = response.data.count;
-            setTotalTickets(count);
-            console.log(count);
-        } catch (error) {
-            console.error("Error fetching total tickets:", error);
-        }
-    };
+        const currentStation = stationMap.get(currentStationId);
 
-    useEffect(() => {
-        fetchUsers();
-        fetchTotalTickets();
-    }, []);
+        // Visit each neighboring station of the current station
+        const neighboringStations = currentStation.trainLine.stations;
+        for (let i = 0; i < neighboringStations.length; i++) {
+            const neighboringStationId = neighboringStations[i]._id.toString();
+            const neighboringStation = stationMap.get(neighboringStationId);
+            const weight = neighboringStation.index - currentStation.index;
 
-    const handleRemoveUser = async (userId) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this user?"
-        );
+            // Calculate the new distance from the source station to the neighboring station
+            const distanceToNeighboringStation = currentDistance + weight;
 
-        if (confirmed) {
-            try {
-                await axios.delete(`http://localhost:8001/users/${userId}`);
-                // Remove the deleted user from the users state
-                setUsers((prevUsers) =>
-                    prevUsers.filter((user) => user._id !== userId)
+            if (
+                distanceToNeighboringStation <
+                distances.get(neighboringStationId)
+            ) {
+                // Found a shorter path, update the distance and enqueue the neighboring station
+                distances.set(
+                    neighboringStationId,
+                    distanceToNeighboringStation
                 );
-                console.log(`Removing user with ID: ${userId}`);
-                toast.success(`User deleted successfully!`);
-            } catch (error) {
-                console.error("Error removing user:", error);
-                toast.error("Error, there was a mistake!");
+                previousStations.set(neighboringStationId, currentStationId);
+                priorityQueue.enqueue(
+                    neighboringStationId,
+                    distanceToNeighboringStation
+                );
             }
         }
-    };
+    }
 
-    const handleUpdateUser = (user) => {
-        setIsEditing(true);
-        setEditedUser(user);
-    };
+    // Reconstruct the shortest path from the source station to the target station
+    const shortestPath = [];
+    let currentStationId = targetStationId.toString();
+    while (previousStations.has(currentStationId)) {
+        shortestPath.unshift(currentStationId);
+        currentStationId = previousStations.get(currentStationId);
+    }
+    shortestPath.unshift(sourceStationId.toString());
 
-    const handleSaveChanges = async () => {
-        try {
-            const confirmed = window.confirm(
-                "Do you want to save the changes you made?"
-            );
-            if (confirmed) {
-                await registerSchema.validate(editedUser); // Validate the editedUser object
-                // If validation passes, proceed with saving changes
-                await axios.put(
-                    `http://localhost:8001/users/${editedUser._id}`,
-                    editedUser
-                );
-                // Update the user in the users state
-                setUsers((prevUsers) =>
-                    prevUsers.map((user) =>
-                        user._id === editedUser._id ? editedUser : user
-                    )
-                );
-                setIsEditing(false);
-                toast.success("Changes saved successfully!");
-            }
-        } catch (error) {
-            console.error("Error saving changes:", error);
-            toast.error(error.message);
-        }
-    };
-
-    const handleCancelEdit = () => {
-        setIsEditing(false);
-        setEditedUser({});
-    };
-
-    const handleShowAllTickets = async () => {
-        try {
-            const response = await axios.get("http://localhost:8001/tickets");
-            const tickets = response.data;
-            console.log(tickets);
-        } catch (error) {
-            console.error("Error fetching tickets:", error);
-        }
-    };
-    return (
-        <div>
-            <ToastContainer />
-            <div
-                style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    justifyContent: "space-between",
-                    marginLeft: "3rem",
-                    marginRight: "3rem",
-                    marginTop: "2rem",
-                }}
-            >
-                {users.map((user) => (
-                    <Box
-                        key={user._id}
-                        bgcolor={palette.primary.main}
-                        color={palette.background.alt}
-                        padding="1rem"
-                        marginBottom="1rem"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        borderRadius="4px"
-                        width={isMobile ? "100%" : "45%"}
-                    >
-                        {isEditing && editedUser._id === user._id ? (
-                            <div>
-                                <Typography variant="h6">
-                                    Editing User:
-                                </Typography>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        First Name:
-                                    </Typography>
-                                    <input
-                                        type="text"
-                                        value={editedUser.firstName}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                firstName: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Last Name:
-                                    </Typography>
-                                    <input
-                                        type="text"
-                                        value={editedUser.lastName}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                lastName: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Email:
-                                    </Typography>
-                                    <input
-                                        type="email"
-                                        value={editedUser.email}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                email: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem">
-                                    <Typography variant="body1">
-                                        Password:
-                                    </Typography>
-                                    <input
-                                        type="password"
-                                        value={editedUser.password}
-                                        onChange={(e) =>
-                                            setEditedUser({
-                                                ...editedUser,
-                                                password: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Box>
-                                <Box marginTop="1rem" display="flex">
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleSaveChanges}
-                                        sx={{ marginRight: "1rem" }}
-                                    >
-                                        Save
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleCancelEdit}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </Box>
-                            </div>
-                        ) : (
-                            <div>
-                                <Typography
-                                    variant="h3"
-                                    gutterBottom
-                                    fontSize={"1.5rem"}
-                                >
-                                    {`${user.firstName} ${user.lastName}`}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>First Name:</strong>{" "}
-                                    {user.firstName}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>Last Name:</strong> {user.lastName}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>Email:</strong> {user.email}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    style={{ wordBreak: "break-word" }}
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>Password:</strong> {user.password}
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    gutterBottom
-                                    fontSize={"0.95rem"}
-                                >
-                                    <strong>Role:</strong> {user.role}
-                                </Typography>
-
-                                <Box marginTop="1rem" display="flex">
-                                    <IconButton
-                                        color="inherit"
-                                        onClick={() =>
-                                            handleRemoveUser(user._id)
-                                        }
-                                    >
-                                        <DeleteIcon />
-                                    </IconButton>
-                                    <IconButton
-                                        color="inherit"
-                                        onClick={() => handleUpdateUser(user)}
-                                    >
-                                        <EditIcon />
-                                    </IconButton>
-                                </Box>
-                            </div>
-                        )}
-                    </Box>
-                ))}
-                <Button
-                    variant="contained"
-                    onClick={handleShowAllTickets}
-                    style={{ marginTop: "2rem" }}
-                >
-                    Show All Tickets
-                </Button>
-                <Button variant="contained" style={{ marginTop: "2rem" }}>
-                    Total Tickets: {totalTickets}
-                </Button>
-            </div>
-        </div>
-    );
+    return shortestPath;
 };
 
-export default AdminPage;
+export const getTrainLine = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const trainLine = await TrainLine.findById(id);
+
+        if (!trainLine) {
+            return res.status(404).json({ error: "TrainLine not found !" });
+        }
+
+        res.status(200).json(trainLine);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getTrainLines = async (req, res) => {
+    try {
+        const trainLines = await TrainLine.find();
+
+        res.status(200).json(trainLines);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const updateTrainLine = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, stations, status, time, originalTime } = req.body;
+
+        const updatedTrainLine = await TrainLine.findByIdAndUpdate(
+            id,
+            {
+                name,
+                stations,
+                status,
+                time,
+                originalTime,
+            },
+            { new: true }
+        );
+
+        if (!updatedTrainLine) {
+            return res.status(404).json({ error: "TrainLine not found !" });
+        }
+
+        res.status(200).json(updatedTrainLine);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const deleteTrainLine = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedTrainLine = await TrainLine.findByIdAndDelete(id);
+
+        if (!deletedTrainLine) {
+            return res.status(404).json({ error: "TrainLine not found !" });
+        }
+
+        res.status(204).json(deletedTrainLine);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const createTrainLine = async (req, res) => {
+    try {
+        const { name, stations, status, time, originalTime } = req.body;
+
+        if (!stations) {
+            return res
+                .status(400)
+                .json({ message: "Couldnt find Station! stations function " });
+        }
+        const newTrainLine = new TrainLine({
+            name,
+            stations,
+            status,
+            time,
+            originalTime,
+        });
+
+        // automatic pushes into the array of sstations
+        // const station = await Station.findOneAndUpdate(
+        //     { _id: passenger_id },
+        //     { $push: { tickets: newTicket._id } }
+        // );
+
+        await newTrainLine.save();
+
+        res.status(201).json(newTrainLine);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

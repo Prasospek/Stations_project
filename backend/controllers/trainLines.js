@@ -1,108 +1,71 @@
 import TrainLine from "../models/TrainLine.js";
 import Station from "../models/Station.js";
 
-// A* algorithm implementation
-export async function calculateShortestRoute(
-    startStationId,
-    destinationStationId
-) {
-    // Get the start and destination stations
-    const startStation = await Station.findById(startStationId);
-    const destinationStation = await Station.findById(destinationStationId);
+class Graph {
+    constructor() {
+        this.vertices = new Map();
+    }
 
-    // Create a priority queue to store the stations to be explored
-    const priorityQueue = new PriorityQueue();
-
-    // Initialize the start station with a distance of 0
-    startStation.distance = 0;
-
-    // Enqueue the start station
-    priorityQueue.enqueue(startStation, 0);
-
-    // Keep track of the visited stations
-    const visited = new Set();
-
-    // Keep track of the shortest path from each station
-    const shortestPath = new Map();
-    shortestPath.set(startStation, null);
-
-    while (!priorityQueue.isEmpty()) {
-        // Dequeue the station with the lowest priority (shortest distance)
-        const currentStation = priorityQueue.dequeue().element;
-
-        // Check if the current station is the destination
-        if (currentStation._id.equals(destinationStationId)) {
-            // Build the shortest path from the destination to the start station
-            const path = buildShortestPath(shortestPath, destinationStation);
-
-            // Return the shortest path
-            return path;
+    addEdge(source, target, weight) {
+        if (!this.vertices.has(source)) {
+            this.vertices.set(source, []);
         }
+        if (!this.vertices.has(target)) {
+            this.vertices.set(target, []);
+        }
+        this.vertices.get(source).push({ target, weight });
+        this.vertices.get(target).push({ target: source, weight });
+    }
 
-        // Mark the current station as visited
-        visited.add(currentStation);
+    shortestPath(source, target) {
+        const distances = new Map();
+        const previous = new Map();
+        const queue = new PriorityQueue();
 
-        // Explore the neighbors (connections) of the current station
-        for (const connection of currentStation.connections) {
-            const neighborStation = connection.station;
+        this.vertices.forEach((_, vertex) => {
+            if (vertex === source) {
+                distances.set(vertex, 0);
+                queue.enqueue(vertex, 0);
+            } else {
+                distances.set(vertex, Infinity);
+                queue.enqueue(vertex, Infinity);
+            }
+            previous.set(vertex, null);
+        });
 
-            // Calculate the tentative distance from the start station to the neighbor station
-            const distanceToNeighbor =
-                currentStation.distance + connection.distance;
+        while (!queue.isEmpty()) {
+            const current = queue.dequeue();
+            if (current === target) {
+                break;
+            }
 
-            // Update the neighbor station's distance if it's shorter than the current distance
-            if (
-                !neighborStation.distance ||
-                distanceToNeighbor < neighborStation.distance
-            ) {
-                neighborStation.distance = distanceToNeighbor;
-                shortestPath.set(neighborStation, currentStation);
+            if (distances.get(current) === Infinity) {
+                continue;
+            }
 
-                // Calculate the priority (f-score) for the neighbor station (A* heuristic)
-                const priority =
-                    distanceToNeighbor +
-                    heuristic(neighborStation, destinationStation);
-
-                // Enqueue the neighbor station with its priority
-                priorityQueue.enqueue(neighborStation, priority);
+            const neighbors = this.vertices.get(current);
+            for (const neighbor of neighbors) {
+                const alternateDistance =
+                    distances.get(current) + neighbor.weight;
+                if (alternateDistance < distances.get(neighbor.target)) {
+                    distances.set(neighbor.target, alternateDistance);
+                    previous.set(neighbor.target, current);
+                    queue.enqueue(neighbor.target, alternateDistance);
+                }
             }
         }
+
+        const path = [];
+        let current = target;
+        while (current !== null) {
+            path.unshift(current);
+            current = previous.get(current);
+        }
+
+        return path;
     }
-
-    // If no path is found, return null
-    return null;
 }
 
-// Helper function to build the shortest path from the destination to the start station
-function buildShortestPath(shortestPath, destinationStation) {
-    const path = [destinationStation];
-    let currentStation = destinationStation;
-
-    while (shortestPath.get(currentStation)) {
-        currentStation = shortestPath.get(currentStation);
-        path.unshift(currentStation);
-    }
-
-    return path;
-}
-
-// Heuristic function for the A* algorithm (you can customize this based on your needs)
-function heuristic(stationA, stationB) {
-    // For simplicity, let's assume the heuristic is the straight-line distance between two stations
-    const latA = stationA.coordinates[0];
-    const lonA = stationA.coordinates[1];
-    const latB = stationB.coordinates[0];
-    const lonB = stationB.coordinates[1];
-
-    // Calculate the Euclidean distance between the coordinates
-    const distance = Math.sqrt(
-        Math.pow(latA - latB, 2) + Math.pow(lonA - lonB, 2)
-    );
-
-    return distance;
-}
-
-// Priority queue implementation for A* algorithm
 class PriorityQueue {
     constructor() {
         this.elements = [];
@@ -111,7 +74,6 @@ class PriorityQueue {
     enqueue(element, priority) {
         const queueElement = { element, priority };
         let added = false;
-
         for (let i = 0; i < this.elements.length; i++) {
             if (queueElement.priority < this.elements[i].priority) {
                 this.elements.splice(i, 0, queueElement);
@@ -119,18 +81,13 @@ class PriorityQueue {
                 break;
             }
         }
-
         if (!added) {
             this.elements.push(queueElement);
         }
     }
 
     dequeue() {
-        if (this.isEmpty()) {
-            return null;
-        }
-
-        return this.elements.shift();
+        return this.elements.shift().element;
     }
 
     isEmpty() {
@@ -138,24 +95,112 @@ class PriorityQueue {
     }
 }
 
-export async function findPath(req, res) {
-    try {
-        const { startStationId, destinationStationId } = req.body;
+export const findShortestPath = async (sourceStationId, targetStationId) => {
+    const trainLines = [
+        {
+            _id: "648de90d92659667578bae77",
+            name: "St1-St3",
+            stations: ["6485f933e63353dd9f5c4a85", "6485f948e63353dd9f5c4a89"],
+            status: "maintenance",
+            time: 30,
+            createdAt: "2023-06-17T17:10:37.110Z",
+            updatedAt: "2023-06-18T17:27:48.833Z",
+            __v: 0,
+            originalTime: 10,
+        },
+        {
+            _id: "648de97392659667578bae7b",
+            name: "St4-St2",
+            stations: ["6485f94ce63353dd9f5c4a8b", "6485f944e63353dd9f5c4a87"],
+            status: "maintenance",
+            time: 27,
+            createdAt: "2023-06-17T17:12:19.249Z",
+            updatedAt: "2023-06-18T14:14:47.209Z",
+            __v: 0,
+            originalTime: 2,
+        },
+        {
+            _id: "648de99892659667578bae7d",
+            name: "St2-St5",
+            stations: ["6485f944e63353dd9f5c4a87", "6485f94fe63353dd9f5c4a8d"],
+            status: "operational",
+            time: 7,
+            createdAt: "2023-06-17T17:12:56.614Z",
+            updatedAt: "2023-06-18T13:42:56.713Z",
+            __v: 0,
+            originalTime: 7,
+        },
+        {
+            _id: "648de9be92659667578bae7f",
+            name: "St5-St6",
+            stations: ["6485f94fe63353dd9f5c4a8d", "6485f951e63353dd9f5c4a8f"],
+            status: "operational",
+            time: 8,
+            createdAt: "2023-06-17T17:13:34.834Z",
+            updatedAt: "2023-06-18T13:43:31.878Z",
+            __v: 0,
+            originalTime: 8,
+        },
+        {
+            _id: "648de9fb92659667578bae81",
+            name: "St4-St6",
+            stations: ["6485f94ce63353dd9f5c4a8b", "6485f951e63353dd9f5c4a8f"],
+            status: "operational",
+            time: 17,
+            createdAt: "2023-06-17T17:14:35.139Z",
+            updatedAt: "2023-06-18T13:44:11.277Z",
+            __v: 0,
+            originalTime: 17,
+        },
+        {
+            _id: "648dea1a92659667578bae83",
+            name: "St6-St7",
+            stations: ["6485f951e63353dd9f5c4a8f", "6485f956e63353dd9f5c4a91"],
+            status: "operational",
+            time: 10,
+            createdAt: "2023-06-17T17:15:06.380Z",
+            updatedAt: "2023-06-18T13:44:46.087Z",
+            __v: 0,
+            originalTime: 10,
+        },
+        {
+            _id: "648e4dc2398d8fd81e03d788",
+            name: "St3-St4",
+            stations: ["6485f948e63353dd9f5c4a89", "6485f94ce63353dd9f5c4a8b"],
+            status: "operational",
+            time: 5,
+            createdAt: "2023-06-18T00:20:18.783Z",
+            updatedAt: "2023-06-18T13:45:26.583Z",
+            __v: 0,
+            originalTime: 5,
+        },
+    ];
 
-        const shortestPath = await calculateShortestRoute(
-            startStationId,
-            destinationStationId
-        );
-
-        if (shortestPath) {
-            res.status(200).json({ path: shortestPath });
-        } else {
-            res.status(404).json({ error: "No path found" });
+    const stationMap = new Map();
+    trainLines.forEach((line) => {
+        const stations = line.stations;
+        for (let i = 0; i < stations.length; i++) {
+            const stationId = stations[i];
+            if (!stationMap.has(stationId)) {
+                stationMap.set(stationId, { line: line.name, index: i });
+            }
         }
-    } catch (error) {
-        res.status(500).json({ error: "Internal server error" });
-    }
-}
+    });
+
+    const graph = new Graph();
+    trainLines.forEach((line) => {
+        const stations = line.stations;
+        for (let i = 0; i < stations.length - 1; i++) {
+            const sourceStationId = stations[i];
+            const targetStationId = stations[i + 1];
+            const weight = line.time;
+            graph.addEdge(sourceStationId, targetStationId, weight);
+        }
+    });
+
+    const shortestPath = graph.shortestPath(sourceStationId, targetStationId);
+    return shortestPath;
+};
 
 export const getTrainLine = async (req, res) => {
     try {
