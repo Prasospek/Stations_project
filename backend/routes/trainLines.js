@@ -8,13 +8,13 @@ import {
     findShortestPath,
 } from "../controllers/trainLines.js";
 
-import { authRole } from "../middleware/auth.js";
+import { authRole, verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
 /* POST */
 
-router.post("/", createTrainLine);
+router.post("/", verifyToken, createTrainLine);
 
 /* GET */
 router.get("/:id", getTrainLine);
@@ -45,11 +45,21 @@ router.get(
 );
 
 /* PUT */
-router.put("/:id", authRole(["admin", "technician"]), updateTrainLine);
+router.put(
+    "/:id",
+    verifyToken,
+    authRole(["admin", "technician"]),
+    updateTrainLine
+);
 
 /* DELETE */
-router.delete("/:id", authRole(["admin", "technician"]), deleteTrainLine);
+router.delete(
+    "/:id",
+    verifyToken,
+    authRole(["admin", "technician"]),
+    deleteTrainLine
+);
 
 export default router;
 
-// IMPORT MIDDELWARE JE TO ADMIN,TECHNICIAN?
+

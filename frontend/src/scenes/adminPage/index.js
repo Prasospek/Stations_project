@@ -7,8 +7,6 @@ import {
     Typography,
     Button,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
@@ -37,9 +35,6 @@ const registerSchema = yup.object().shape({
 
 const AdminPage = () => {
     const { palette } = useTheme();
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const user = useSelector((state) => state.user);
     const isMobile = useMediaQuery("(max-width:800px)");
 
     const [users, setUsers] = useState([]);

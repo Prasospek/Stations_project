@@ -29,4 +29,4 @@ router.delete("/:id", authRole(["admin", "technician"]), deleteTicket); // zruš
 
 export default router;
 
-// IMPORT MIDDELWARE JE TO ADMIN,TECHNICIAN?
+

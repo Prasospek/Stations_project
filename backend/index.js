@@ -13,7 +13,6 @@ import authRoutes from "./routes/auth.js";
 import stationRoutes from "./routes/stations.js";
 import ticketRoutes from "./routes/tickets.js";
 import trainLinesRoutes from "./routes/trainLines.js";
-import issueRoutes from "./routes/issues.js";
 import infoBoardsRoutes from "./routes/infoBoards.js";
 import users from "./routes/users.js";
 
@@ -33,7 +32,6 @@ app.use("/auth", authRoutes);
 app.use("/stations", stationRoutes);
 app.use("/tickets", ticketRoutes);
 app.use("/trainlines", trainLinesRoutes);
-app.use("/issues", issueRoutes);
 app.use("/info-boards", infoBoardsRoutes);
 app.use("/users", users);
 

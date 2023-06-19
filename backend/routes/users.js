@@ -8,7 +8,7 @@ import {
     deleteUser,
 } from "../controllers/users.js";
 
-import { authRole } from "../middleware/auth.js";
+import { authRole, verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -18,11 +18,11 @@ router.get("/:id", getUser); // Ziskani specifické Usera
 router.get("/:id/tickets", getUsersTickets); // Ziskani vsech jizdenek Usera
 
 /* PUT */
-router.put("/:id", authRole(["admin"]), updateUser); // Upraveni detailu Usera
+router.put("/:id", verifyToken, authRole(["admin"]), updateUser); // Upraveni detailu Usera
 
 /* DELETE */
-router.delete("/:id", authRole(["admin"]), deleteUser); // zrušení Usera
+router.delete("/:id", verifyToken, authRole(["admin"]), deleteUser); // zrušení Usera
 
 export default router;
 
-// IMPORT MIDDELWARE JE TO ADMIN,TECHNICIAN?
+

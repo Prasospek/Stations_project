@@ -8,7 +8,7 @@ import {
     getStationConnections,
 } from "../controllers/stations.js";
 
-import { authRole } from "../middleware/auth.js";
+import { authRole, verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -18,14 +18,23 @@ router.get("/:id", getStation); // ziskani detailu konkretni stanice
 router.get("/:id/connections", getStationConnections);
 
 /* POST */
-router.post("/", authRole(["admin", "technician"]), createStation); // vytvoreni nove stanice
+router.post("/", verifyToken, authRole(["admin", "technician"]), createStation); // vytvoreni nove stanice
 
 /* PUT */
-router.put("/:id", authRole(["admin", "technician"]), updateStation); // aktualizace detailu silnice
+router.put(
+    "/:id",
+    verifyToken,
+    authRole(["admin", "technician"]),
+    updateStation
+); // aktualizace detailu silnice
 
 /* DELETE */
-router.delete("/:id", authRole(["admin", "technician"]), deleteStation); // odstraneni stanice
+router.delete(
+    "/:id",
+    verifyToken,
+    authRole(["admin", "technician"]),
+    deleteStation
+); // odstraneni stanice
 
 export default router;
 
-// IMPORT MIDDELWARE JE TO ADMIN,TECHNICIAN?
