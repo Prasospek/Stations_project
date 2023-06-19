@@ -28,3 +28,7 @@ Implementujte systém pro podzemní dopravu na Marsu.
 <li>Osobní obhajoba projektu ve zkouškovém před nebo po zkoušce. ✅</li>
 </ul>
 
+Create .env file in backend ->
+PORT=XXXX
+JWT_SECRET=XXX
+MONGO_URL=mongodb+srv://fildastibor:CHANGEPASSWORDHERE@cluster0.hp7lhsh.mongodb.net/

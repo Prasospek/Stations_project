@@ -9,6 +9,8 @@ import {
     getCount,
 } from "../controllers/tickets.js";
 
+import { authRole } from "../middleware/auth.js";
+
 const router = express.Router();
 
 /*GET */
@@ -20,10 +22,10 @@ router.get("/:id", getTicket); // Ziskani specifické jizdenky
 router.post("/", createTicket); // Vytvoreni nove jizdenky
 
 /* PUT */
-router.put("/:id", updateTicket); // Upraveni detailu jizdenky
+router.put("/:id", authRole(["admin", "technician"]), updateTicket); // Upraveni detailu jizdenky
 
 /* DELETE */
-router.delete("/:id", deleteTicket); // zrušení jizdenky
+router.delete("/:id", authRole(["admin", "technician"]), deleteTicket); // zrušení jizdenky
 
 export default router;
 

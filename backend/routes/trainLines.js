@@ -8,6 +8,8 @@ import {
     findShortestPath,
 } from "../controllers/trainLines.js";
 
+import { authRole } from "../middleware/auth.js";
+
 const router = express.Router();
 
 /* POST */
@@ -43,10 +45,10 @@ router.get(
 );
 
 /* PUT */
-router.put("/:id", updateTrainLine);
+router.put("/:id", authRole(["admin", "technician"]), updateTrainLine);
 
 /* DELETE */
-router.delete("/:id", deleteTrainLine);
+router.delete("/:id", authRole(["admin", "technician"]), deleteTrainLine);
 
 export default router;
 

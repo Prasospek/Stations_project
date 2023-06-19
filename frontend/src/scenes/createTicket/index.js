@@ -158,7 +158,7 @@ const CreateTicketForm = () => {
                 alignItems="center"
                 height="45vh"
             >
-                <Box width="70%" marginTop={"15rem"}>
+                <Box width="70%" marginTop={"20rem"}>
                     <h2>Buy Ticket</h2>
                     <Formik
                         initialValues={initialTicketValues}
@@ -324,7 +324,7 @@ const CreateTicketForm = () => {
                                     </p>
                                     <p>
                                         <b>Status:</b> {line.status}
-                                    </p>
+                                    </p>                         
                                 </div>
                             ))
                         ) : (

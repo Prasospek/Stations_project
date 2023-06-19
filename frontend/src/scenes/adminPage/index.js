@@ -377,6 +377,13 @@ const AdminPage = () => {
                                 >
                                     <strong>Role:</strong> {user.role}
                                 </Typography>
+                                <Typography
+                                    variant="body1"
+                                    gutterBottom
+                                    fontSize={"0.95rem"}
+                                >
+                                    <strong>Passenger ID:</strong> {user._id}
+                                </Typography>
 
                                 <Box marginTop="1rem" display="flex">
                                     <IconButton
