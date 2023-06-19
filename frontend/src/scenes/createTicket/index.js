@@ -316,16 +316,48 @@ const CreateTicketForm = () => {
 
                     <Box sx={{ marginTop: "2rem" }}>
                         <h2>Disrupted Train Lines</h2>
-                        {getDisruptedTrainLines().map((line) => (
-                            <div key={line._id}>
-                                <p>
-                                    <b>Name:</b> {line.name}
-                                </p>
-                                <p>
-                                    <b>Status:</b> {line.status}
-                                </p>
-                            </div>
-                        ))}
+                        {getDisruptedTrainLines().length > 0 ? (
+                            getDisruptedTrainLines().map((line) => (
+                                <div key={line._id}>
+                                    <p>
+                                        <b>Name:</b> {line.name}
+                                    </p>
+                                    <p>
+                                        <b>Status:</b> {line.status}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No disrupted train lines right now</p>
+                        )}
+                    </Box>
+
+                    <Box sx={{ marginTop: "2rem" }}>
+                        <h2>Maintenance Time</h2>
+                        {trainLines.filter(
+                            (line) => line.status === "maintenance"
+                        ).length > 0 ? (
+                            trainLines.map((line) => {
+                                if (line.status === "maintenance") {
+                                    return (
+                                        <div key={line._id}>
+                                            <p>
+                                                <b>Name:</b> {line.name}
+                                            </p>
+                                            <p>
+                                                <b>Maintenance Time:</b>{" "}
+                                                {line.time} minutes from
+                                                original {line.originalTime}{" "}
+                                                minutes
+                                            </p>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })
+                        ) : (
+                            <p>No maintenance train lines right now</p>
+                        )}
                     </Box>
 
                     <Box
