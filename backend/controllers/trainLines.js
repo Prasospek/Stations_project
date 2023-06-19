@@ -118,7 +118,8 @@ export const findShortestPath = async (sourceStationId, targetStationId) => {
             for (let i = 0; i < stations.length - 1; i++) {
                 const sourceStationId = stations[i];
                 const targetStationId = stations[i + 1];
-                const weight = line.time; // Corrected here
+                const weight =
+                    line.status === "disruption" ? Infinity : line.time;
                 graph.addEdge(sourceStationId, targetStationId, weight);
             }
         });

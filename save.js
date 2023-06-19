@@ -1,291 +1,233 @@
-import React, { useState, useEffect } from "react";
+import TrainLine from "../models/TrainLine.js";
+import Station from "../models/Station.js";
 import axios from "axios";
-import Navbar from "../navbar";
-import Footer from "../footer/footer";
-import {
-    TextField,
-    Button,
-    Select,
-    MenuItem,
-    useMediaQuery,
-    useTheme,
-    Box,
-} from "@mui/material";
-import { Formik } from "formik";
-import * as yup from "yup";
-import { useSelector } from "react-redux";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
 
-const ticketSchema = yup.object().shape({
-    station_id: yup
-        .string()
-        .min(6, "Station ID must be at least 6 characters")
-        .required("Station ID is required"),
-    purchase_method: yup
-        .string()
-        .oneOf(
-            ["Station", "Online"],
-            "Purchase Method must be either 'Station' or 'Online'"
-        )
-        .required("Purchase Method is required"),
-    destination_id: yup
-        .string()
-        .min(6, "Destination ID must be at least 6 characters")
-        .required("Destination ID is required"),
-});
+class Graph {
+    constructor() {
+        this.vertices = new Map();
+    }
 
-const initialTicketValues = {
-    station_id: "",
-    purchase_method: "",
-    destination_id: "",
+    addEdge(source, target, weight) {
+        if (!this.vertices.has(source)) {
+            this.vertices.set(source, []);
+        }
+        if (!this.vertices.has(target)) {
+            this.vertices.set(target, []);
+        }
+        this.vertices.get(source).push({ target: target, weight: weight });
+        this.vertices.get(target).push({ target: source, weight: weight });
+    }
+
+    shortestPath(source, target) {
+        const distances = new Map();
+        const previous = new Map();
+        const queue = new PriorityQueue();
+
+        this.vertices.forEach((_, vertex) => {
+            if (vertex === source) {
+                distances.set(vertex, 0);
+                queue.enqueue(vertex, 0);
+            } else {
+                distances.set(vertex, Infinity);
+                queue.enqueue(vertex, Infinity);
+            }
+            previous.set(vertex, null);
+        });
+
+        while (!queue.isEmpty()) {
+            const current = queue.dequeue();
+            if (current === target) {
+                break;
+            }
+
+            if (distances.get(current) === Infinity) {
+                continue;
+            }
+
+            const neighbors = this.vertices.get(current);
+            for (const neighbor of neighbors) {
+                const alternateDistance =
+                    distances.get(current) + neighbor.weight;
+                if (alternateDistance < distances.get(neighbor.target)) {
+                    distances.set(neighbor.target, alternateDistance);
+                    previous.set(neighbor.target, current);
+                    queue.enqueue(neighbor.target, alternateDistance);
+                }
+            }
+        }
+
+        const path = [];
+        let current = target;
+        while (current !== null) {
+            path.unshift(current);
+            current = previous.get(current);
+        }
+
+        return path;
+    }
+}
+
+class PriorityQueue {
+    constructor() {
+        this.elements = [];
+    }
+
+    enqueue(element, priority) {
+        const queueElement = { element, priority };
+        let added = false;
+        for (let i = 0; i < this.elements.length; i++) {
+            if (queueElement.priority < this.elements[i].priority) {
+                this.elements.splice(i, 0, queueElement);
+                added = true;
+                break;
+            }
+        }
+        if (!added) {
+            this.elements.push(queueElement);
+        }
+    }
+
+    dequeue() {
+        return this.elements.shift().element;
+    }
+
+    isEmpty() {
+        return this.elements.length === 0;
+    }
+}
+
+export const findShortestPath = async (sourceStationId, targetStationId) => {
+    try {
+        const response = await axios.get("http://localhost:8001/trainlines");
+        const trainLines = response.data;
+
+        const stationMap = new Map();
+        trainLines.forEach((line) => {
+            const stations = line.stations;
+            for (let i = 0; i < stations.length; i++) {
+                const stationId = stations[i];
+                if (!stationMap.has(stationId)) {
+                    stationMap.set(stationId, { line: line.name, index: i });
+                }
+            }
+        });
+
+        const graph = new Graph();
+        trainLines.forEach((line) => {
+            const stations = line.stations;
+            for (let i = 0; i < stations.length - 1; i++) {
+                const sourceStationId = stations[i];
+                const targetStationId = stations[i + 1];
+                const weight = line.time; // Corrected here
+                graph.addEdge(sourceStationId, targetStationId, weight);
+            }
+        });
+
+        const shortestPath = graph.shortestPath(
+            sourceStationId,
+            targetStationId
+        );
+        return shortestPath;
+    } catch (error) {
+        console.error("Error fetching trainLines:", error);
+        return null;
+    }
 };
 
-const CreateTicketForm = () => {
-    const { palette } = useTheme();
-    const isNonMobile = useMediaQuery("(min-width:800px)");
+export const getTrainLine = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const trainLine = await TrainLine.findById(id);
 
-    const [stations, setStations] = useState([]);
-    const userId = useSelector((state) => state.user._id);
-    const navigate = useNavigate();
-    const [shortestPath, setShortestPath] = useState([]);
-    const [selectedStationId, setSelectedStationId] = useState("");
-    const [selectedDestinationId, setSelectedDestinationId] = useState("");
-
-    useEffect(() => {
-        fetchStations();
-    }, []);
-
-    const fetchStations = async () => {
-        try {
-            const response = await axios.get("http://localhost:8001/stations");
-            setStations(response.data);
-        } catch (error) {
-            console.error("Error fetching stations:", error.message);
+        if (!trainLine) {
+            return res.status(404).json({ error: "TrainLine not found !" });
         }
-    };
 
-    const handleSubmit = async (values, { resetForm, setSubmitting }) => {
-        try {
-            const response = await axios.post("http://localhost:8001/tickets", {
-                passenger_id: userId,
-                station_id: values.station_id,
-                purchase_method: values.purchase_method,
-                destination_id: values.destination_id,
-            });
-
-            console.log(response.data); // New ticket object
-
-            // Reset form fields
-            resetForm();
-
-            toast.success("Ticket created successfully");
-            navigate("/home");
-        } catch (error) {
-            console.error("Error creating ticket:", error.message);
-            toast.error("Error creating ticket");
-        } finally {
-            setSubmitting(false);
-        }
-    };
-
-    const handleRetrieveIds = () => {
-        console.log("Selected Station ID:", selectedStationId);
-        console.log("Selected Destination ID:", selectedDestinationId);
-    };
-
-    const handleShowShortestPath = async () => {
-        try {
-            // Make a request to fetch the shortest path
-            const response = await axios.get(
-                `http://localhost:8001/trainlines/shortest-path/${selectedStationId}/${selectedDestinationId}`
-            );
-
-            const shortestPathIds = response.data.shortestPath;
-
-            // Fetch station names based on the IDs
-            const shortestPathNames = await Promise.all(
-                shortestPathIds.map(async (stationId) => {
-                    const stationResponse = await axios.get(
-                        `http://localhost:8001/stations/${stationId}`
-                    );
-                    return stationResponse.data.name;
-                })
-            );
-
-            setShortestPath(shortestPathNames);
-        } catch (error) {
-            console.error("Error fetching shortest path:", error.message);
-        }
-    };
-
-    return (
-        <div>
-            <Navbar />
-            <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                height="45vh"
-            >
-                <Box width="70%" marginTop={"15rem"}>
-                    <h2>Buy Ticket</h2>
-                    <Formik
-                        initialValues={initialTicketValues}
-                        validationSchema={ticketSchema}
-                        onSubmit={handleSubmit}
-                    >
-                        {({
-                            values,
-                            errors,
-                            touched,
-                            handleBlur,
-                            handleChange,
-                            handleSubmit,
-                            isSubmitting,
-                        }) => (
-                            <form onSubmit={handleSubmit}>
-                                <Box display="grid" gap="30px">
-                                    <Select
-                                        label="Station"
-                                        id="station_id"
-                                        name="station_id"
-                                        value={values.station_id}
-                                        onChange={(event) => {
-                                            handleChange(event);
-                                            setSelectedStationId(
-                                                event.target.value
-                                            );
-                                        }}
-                                        onBlur={handleBlur}
-                                        error={
-                                            touched.station_id &&
-                                            Boolean(errors.station_id)
-                                        }
-                                        required
-                                        fullWidth
-                                        sx={{
-                                            gridColumn: isNonMobile
-                                                ? undefined
-                                                : "span 2",
-                                        }}
-                                    >
-                                        {stations.map((station) => (
-                                            <MenuItem
-                                                key={station._id}
-                                                value={station._id}
-                                            >
-                                                {station.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-
-                                    <Select
-                                        label="Purchase Method"
-                                        name="purchase_method"
-                                        value={values.purchase_method}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        error={
-                                            touched.purchase_method &&
-                                            Boolean(errors.purchase_method)
-                                        }
-                                        required
-                                        fullWidth
-                                        sx={{
-                                            gridColumn: isNonMobile
-                                                ? undefined
-                                                : "span 2",
-                                        }}
-                                    >
-                                        <MenuItem value="Online">
-                                            Online
-                                        </MenuItem>
-                                        <MenuItem value="Station">
-                                            Station
-                                        </MenuItem>
-                                    </Select>
-
-                                    <Select
-                                        label="Destination"
-                                        name="destination_id"
-                                        value={values.destination_id}
-                                        onChange={(event) => {
-                                            handleChange(event);
-                                            setSelectedDestinationId(
-                                                event.target.value
-                                            );
-                                        }}
-                                        onBlur={handleBlur}
-                                        error={
-                                            touched.destination_id &&
-                                            Boolean(errors.destination_id)
-                                        }
-                                        required
-                                        fullWidth
-                                        sx={{
-                                            gridColumn: isNonMobile
-                                                ? undefined
-                                                : "span 2",
-                                        }}
-                                    >
-                                        {stations.map((station) => (
-                                            <MenuItem
-                                                key={station._id}
-                                                value={station._id}
-                                            >
-                                                {station.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </Box>
-
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    disabled={isSubmitting}
-                                    sx={{
-                                        marginTop: "1rem",
-                                    }}
-                                >
-                                    Create Ticket
-                                </Button>
-                            </form>
-                        )}
-                    </Formik>
-                    <Button
-                        variant="contained"
-                        onClick={handleRetrieveIds}
-                        sx={{
-                            marginTop: "2rem",
-                            marginLeft: "20rem",
-                        }}
-                    >
-                        Retrieve Station ID and Destination ID
-                    </Button>
-
-                    <Button
-                        variant="contained"
-                        onClick={handleShowShortestPath}
-                        sx={{
-                            marginTop: "2rem",
-                            marginLeft: "20rem",
-                        }}
-                    >
-                        Show Shortest Path
-                    </Button>
-
-                    {shortestPath.length > 0 && (
-                        <Box sx={{ marginTop: "1rem" }}>
-                            <h3>Shortest Path: {shortestPath.join(" -> ")}</h3>
-                        </Box>
-                    )}
-                </Box>
-            </Box>
-            <Footer />
-        </div>
-    );
+        res.status(200).json(trainLine);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
-export default CreateTicketForm;
+export const getTrainLines = async (req, res) => {
+    try {
+        const trainLines = await TrainLine.find();
+
+        res.status(200).json(trainLines);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const updateTrainLine = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, stations, status, time, originalTime } = req.body;
+
+        const updatedTrainLine = await TrainLine.findByIdAndUpdate(
+            id,
+            {
+                name,
+                stations,
+                status,
+                time,
+                originalTime,
+            },
+            { new: true }
+        );
+
+        if (!updatedTrainLine) {
+            return res.status(404).json({ error: "TrainLine not found !" });
+        }
+
+        res.status(200).json(updatedTrainLine);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const deleteTrainLine = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedTrainLine = await TrainLine.findByIdAndDelete(id);
+
+        if (!deletedTrainLine) {
+            return res.status(404).json({ error: "TrainLine not found !" });
+        }
+
+        res.status(204).json(deletedTrainLine);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const createTrainLine = async (req, res) => {
+    try {
+        const { name, stations, status, time, originalTime } = req.body;
+
+        if (!stations) {
+            return res
+                .status(400)
+                .json({ message: "Couldnt find Station! stations function " });
+        }
+        const newTrainLine = new TrainLine({
+            name,
+            stations,
+            status,
+            time,
+            originalTime,
+        });
+
+        // automatic pushes into the array of sstations
+        // const station = await Station.findOneAndUpdate(
+        //     { _id: passenger_id },
+        //     { $push: { tickets: newTicket._id } }
+        // );
+
+        await newTrainLine.save();
+
+        res.status(201).json(newTrainLine);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

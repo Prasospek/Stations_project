@@ -47,6 +47,7 @@ const CreateTicketForm = () => {
     const isNonMobile = useMediaQuery("(min-width:800px)");
 
     const [stations, setStations] = useState([]);
+    const [trainLines, setTrainLines] = useState([]);
     const userId = useSelector((state) => state.user._id);
     const navigate = useNavigate();
     const [shortestPath, setShortestPath] = useState([]);
@@ -55,6 +56,7 @@ const CreateTicketForm = () => {
 
     useEffect(() => {
         fetchStations();
+        fetchTrainLines();
     }, []);
 
     const fetchStations = async () => {
@@ -63,6 +65,17 @@ const CreateTicketForm = () => {
             setStations(response.data);
         } catch (error) {
             console.error("Error fetching stations:", error.message);
+        }
+    };
+
+    const fetchTrainLines = async () => {
+        try {
+            const response = await axios.get(
+                "http://localhost:8001/trainlines"
+            );
+            setTrainLines(response.data);
+        } catch (error) {
+            console.error("Error fetching train lines:", error.message);
         }
     };
 
@@ -118,6 +131,10 @@ const CreateTicketForm = () => {
         } catch (error) {
             console.error("Error fetching shortest path:", error.message);
         }
+    };
+
+    const getDisruptedTrainLines = () => {
+        return trainLines.filter((line) => line.status === "disruption");
     };
 
     return (
@@ -274,6 +291,20 @@ const CreateTicketForm = () => {
                             <h3>Shortest Path: {shortestPath.join(" -> ")}</h3>
                         </Box>
                     )}
+
+                    <Box sx={{ marginTop: "2rem" }}>
+                        <h2>Disrupted Train Lines</h2>
+                        {getDisruptedTrainLines().map((line) => (
+                            <div key={line._id}>
+                                <p>
+                                    <b>Name:</b> {line.name}
+                                </p>
+                                <p>
+                                    <b>Status:</b> {line.status}
+                                </p>
+                            </div>
+                        ))}
+                    </Box>
                 </Box>
             </Box>
             <Footer />
