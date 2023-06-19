@@ -3,15 +3,15 @@
 Implementujte systém pro podzemní dopravu na Marsu.
 
 <ul>
-<li>Systém obsahuje více stanic na povrchu a v podzemí planety.</li>
-<li>Cestující si mohou zakoupit jízdenky na stanici přes pracovníka nebo sami online.</li>
-<li>Každá stanice má své označení a spojení s ostatními stanicemi.</li>
-<li>Cestující si mohou vybrat svůj cíl a systém jim nabídne nejkratší trasu.</li>
-<li>Systém zohledňuje aktuální provoz a stav tratí a nabízí alternativní trasy v případě poruch nebo výluk.</li>
+<li>Systém obsahuje více stanic na povrchu a v podzemí planety. ✅</li>
+<li>Cestující si mohou zakoupit jízdenky na stanici přes pracovníka nebo sami online. ✅</li>
+<li>Každá stanice má své označení a spojení s ostatními stanicemi. ✅</li>
+<li>Cestující si mohou vybrat svůj cíl a systém jim nabídne nejkratší trasu. ✅</li>
+<li>Systém zohledňuje aktuální provoz a stav tratí a nabízí alternativní trasy v případě poruch nebo výluk. ✅</li>
 <li>Na stanicích jsou k dispozici informační tabule s aktuálními informacemi o jízdním řádu a provozu. Informační tabule jsou chytré televize schopné zobrazit webovou stránku.</li>
 <li>Systém umožňuje cestujícím sledovat polohu vlaku na mapě (bonus)</li>
-<li>Technici mohou sledovat stav tratí a zadávat problémy a poruchy.</li>
-<li>Administrátor systému může spravovat uživatelské účty a zobrazovat statistiky o provozu a využívání metra na Marsu.</li>
+<li>Technici mohou sledovat stav tratí a zadávat problémy a poruchy.✅</li>
+<li>Administrátor systému může spravovat uživatelské účty a zobrazovat statistiky o provozu a využívání metra na Marsu.✅</li>
 </ul>
 
 <b><h2>Požadavky</h2></b>

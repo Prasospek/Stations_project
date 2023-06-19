@@ -8,7 +8,7 @@ import {
     deleteUser,
 } from "../controllers/users.js";
 
-
+import { authRole } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -21,6 +21,6 @@ router.get("/:id/tickets", getUsersTickets); // Ziskani vsech jizdenek Usera
 router.put("/:id", updateUser); // Upraveni detailu Usera
 
 /* DELETE */
-router.delete("/:id", deleteUser); // zrušení Usera
+router.delete("/:id", authRole(["admin", "technician"]), deleteUser); // zrušení Usera
 
 export default router;
