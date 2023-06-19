@@ -8,19 +8,17 @@ import {
     findShortestPath,
 } from "../controllers/trainLines.js";
 
-import { authRole, verifyToken } from "../middleware/auth.js";
-
 const router = express.Router();
 
 /* POST */
 
-router.post("/", verifyToken, createTrainLine);
+router.post("/", createTrainLine);
 
 /* GET */
 router.get("/:id", getTrainLine);
 router.get("/", getTrainLines);
 
-// Assuming you have already imported the necessary dependencies and models
+
 
 router.get(
     "/shortest-path/:sourceStationId/:targetStationId",
@@ -45,21 +43,9 @@ router.get(
 );
 
 /* PUT */
-router.put(
-    "/:id",
-    verifyToken,
-    authRole(["admin", "technician"]),
-    updateTrainLine
-);
+router.put("/:id",updateTrainLine);
 
 /* DELETE */
-router.delete(
-    "/:id",
-    verifyToken,
-    authRole(["admin", "technician"]),
-    deleteTrainLine
-);
+router.delete("/:id",deleteTrainLine);
 
 export default router;
-
-

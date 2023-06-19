@@ -2,27 +2,19 @@ import "./App.css";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import HomePage from "./scenes/homePage";
 import LoginPage from "./scenes/loginPage";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { ThemeProvider, CssBaseline, createTheme } from "@mui/material";
-import { useMemo } from "react";
 import { themeSettings } from "./theme";
 import Stations from "./scenes/stations/index.js";
 import MyTickets from "./scenes/myTickets";
 import CreateTicket from "./scenes/createTicket";
 
 function App() {
-    //const isAuth = Boolean(useSelector((state) => state.token));
     const mode = useSelector((state) => state.mode);
     const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
     const user = useSelector((state) => state.user);
-
-    const isAuth = Boolean(
-        useSelector((state) => {
-            //console.log("state.token value:", state.token); // Add this line to log the value of state.token
-            //console.log("isAuth value:", isAuth);
-            return state.token;
-        })
-    );
+    const isAuth = Boolean(useSelector((state) => state.token));
 
     return (
         <div className="App">

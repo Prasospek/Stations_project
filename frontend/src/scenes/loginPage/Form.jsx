@@ -7,15 +7,14 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../state/index";
-import FlexBetween from "../../components/FlexBetween";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 
 const registerSchema = yup.object().shape({
     firstName: yup
@@ -67,6 +66,7 @@ const Form = () => {
     const isNonMobile = useMediaQuery("(min-width:800px)");
     const isLogin = pageType === "login";
     const isRegister = pageType === "register";
+
 
     const register = async (values, onSubmitProps) => {
         const registerResponse = await fetch(
