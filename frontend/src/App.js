@@ -13,7 +13,7 @@ import CreateTicket from "./scenes/createTicket";
 function App() {
     const mode = useSelector((state) => state.mode);
     const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
-    const user = useSelector((state) => state.user);
+    
     const isAuth = Boolean(useSelector((state) => state.token));
 
     return (

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
     Box,
-    Typography,
     useMediaQuery,
     useTheme,
     IconButton,
@@ -11,17 +10,13 @@ import {
     DialogContent,
     DialogActions,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
 const TechnicianHomePage = () => {
     const { palette } = useTheme();
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
     const isNonMobile = useMediaQuery("(min-width:800px)");
     const isSmallScreen = useMediaQuery("(max-width:600px)");
 
@@ -29,9 +24,10 @@ const TechnicianHomePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
+    // eslint-disable-next-line
     const [selectedOption, setSelectedOption] = useState("");
     const [selectedTrainLineId, setSelectedTrainLineId] = useState(null); // New state for selected train line ID
-    const [time, setTime] = useState("");
+    // eslint-disable-next-line
     const [originalTime, setOriginalTime] = useState(0);
 
     const fetchStationName = async (stationId) => {

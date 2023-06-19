@@ -7,13 +7,12 @@ import {
     Typography,
     Button,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Footer from "../footer/footer";
 
 const Tickets = () => {
     const { palette } = useTheme();
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const isNonMobile = useMediaQuery("(min-width:800px)");
     const isSmallScreen = useMediaQuery("(max-width:600px)");
@@ -185,7 +184,7 @@ const Tickets = () => {
                         textAlign: "center",
                     }}
                 >
-                    <Typography 
+                    <Typography
                         variant="h2"
                         sx={{
                             margin: "0 0 10px",
