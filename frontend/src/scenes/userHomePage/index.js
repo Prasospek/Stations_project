@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Box, useMediaQuery, useTheme, Modal, Fade } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const UserHomePage = () => {
     const { palette } = useTheme();
-    const dispatch = useDispatch();
+
     const navigate = useNavigate();
-    const isNonMobile = useMediaQuery("(min-width:800px)");
+
     const isSmallScreen = useMediaQuery("(max-width:600px)");
     const user = useSelector((state) => state.user);
-    const userRole = useSelector((state) => state.user.role);
 
     const [showModal, setShowModal] = useState(false);
 
@@ -119,7 +118,7 @@ const UserHomePage = () => {
                     >
                         <img
                             src={`${process.env.PUBLIC_URL}/assets/Train_structure.png`}
-                            alt="Routes Image"
+                            alt="RoutesImage"
                             style={{
                                 maxWidth: "100%",
                                 maxHeight: "100%",

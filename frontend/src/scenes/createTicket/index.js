@@ -3,7 +3,6 @@ import axios from "axios";
 import Navbar from "../navbar";
 import Footer from "../footer/footer";
 import {
-    TextField,
     Button,
     Select,
     MenuItem,
@@ -16,7 +15,7 @@ import {
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useSelector } from "react-redux";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
@@ -115,10 +114,11 @@ const CreateTicketForm = () => {
         }
     };
 
-    const handleRetrieveIds = () => {
-        console.log("Selected Station ID:", selectedStationId);
-        console.log("Selected Destination ID:", selectedDestinationId);
-    };
+    // TEST FOR IMPLEMENTING SHORTEST PATH
+    // const handleRetrieveIds = () => {
+    //     console.log("Selected Station ID:", selectedStationId);
+    //     console.log("Selected Destination ID:", selectedDestinationId);
+    // };
 
     const handleShowShortestPath = async () => {
         try {
@@ -398,7 +398,7 @@ const CreateTicketForm = () => {
                             >
                                 <img
                                     src={`${process.env.PUBLIC_URL}/assets/Train_structure.png`}
-                                    alt="Routes Image"
+                                    alt="RoutesImage"
                                     style={{
                                         maxWidth: "100%",
                                         maxHeight: "100%",

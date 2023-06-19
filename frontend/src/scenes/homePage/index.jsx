@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import Navbar from "../navbar";
 import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
