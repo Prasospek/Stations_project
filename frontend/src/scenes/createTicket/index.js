@@ -9,6 +9,8 @@ import {
     MenuItem,
     useMediaQuery,
     useTheme,
+    Modal,
+    Fade,
     Box,
 } from "@mui/material";
 import { Formik } from "formik";
@@ -53,6 +55,16 @@ const CreateTicketForm = () => {
     const [shortestPath, setShortestPath] = useState([]);
     const [selectedStationId, setSelectedStationId] = useState("");
     const [selectedDestinationId, setSelectedDestinationId] = useState("");
+
+    const [showModal, setShowModal] = useState(false);
+
+    const handleDisplayRoutes = () => {
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
 
     useEffect(() => {
         fetchStations();
@@ -256,35 +268,45 @@ const CreateTicketForm = () => {
                                             </MenuItem>
                                         ))}
                                     </Select>
-                                </Box>
 
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    disabled={isSubmitting}
-                                    sx={{
-                                        marginTop: "1rem",
-                                        padding: "0.9rem",
-                                    }}
-                                >
-                                    Create Ticket
-                                </Button>
+                                    <Box
+                                        display="flex"
+                                        justifyContent="space-between"
+                                        alignItems="center"
+                                    >
+                                        <Button
+                                            type="submit"
+                                            variant="contained"
+                                            disabled={isSubmitting}
+                                            sx={{
+                                                marginTop: "-1rem",
+                                                padding: "0.9rem",
+                                            }}
+                                        >
+                                            Create Ticket
+                                        </Button>
+
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleShowShortestPath}
+                                            sx={{
+                                                marginTop: isNonMobile
+                                                    ? "-1rem"
+                                                    : "1rem",
+                                                marginLeft: "1rem", // Add left margin to create space between buttons
+                                                width: isNonMobile
+                                                    ? undefined
+                                                    : "100%",
+                                                padding: "0.9rem",
+                                            }}
+                                        >
+                                            Show Shortest Path
+                                        </Button>
+                                    </Box>
+                                </Box>
                             </form>
                         )}
                     </Formik>
-
-                    <Button
-                        variant="contained"
-                        onClick={handleShowShortestPath}
-                        sx={{
-                            marginTop: isNonMobile ? "-4rem" : "1rem",
-                            marginLeft: isNonMobile ? "35rem" : "0",
-                            width: isNonMobile ? undefined : "100%",
-                            padding: "0.9rem",
-                        }}
-                    >
-                        Show Shortest Path
-                    </Button>
 
                     {shortestPath.length > 0 && (
                         <Box sx={{ marginTop: "1rem" }}>
@@ -305,11 +327,58 @@ const CreateTicketForm = () => {
                             </div>
                         ))}
                     </Box>
+
+                    <Box
+                        bgcolor={palette.primary.main}
+                        color={palette.background.alt}
+                        padding="0.8rem"
+                        textAlign="center"
+                        borderRadius="5px"
+                        boxShadow="0 2px 5px rgba(0, 0, 0, 0.1)"
+                        style={{ cursor: "pointer" }}
+                        onClick={handleDisplayRoutes}
+                    >
+                        <h2>Routes</h2>
+                    </Box>
+
+                    <Modal
+                        open={showModal}
+                        onClose={handleCloseModal}
+                        closeAfterTransition
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Fade in={showModal}>
+                            <Box
+                                style={{
+                                    maxWidth: "90%",
+                                    maxHeight: "90%",
+                                    backgroundColor: "#fff",
+                                    borderRadius: "8px",
+                                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <img
+                                    src={`${process.env.PUBLIC_URL}/assets/Train_structure.png`}
+                                    alt="Routes Image"
+                                    style={{
+                                        maxWidth: "100%",
+                                        maxHeight: "100%",
+                                    }}
+                                />
+                            </Box>
+                        </Fade>
+                    </Modal>
                 </Box>
             </Box>
             <Footer />
         </div>
     );
 };
-
 export default CreateTicketForm;
