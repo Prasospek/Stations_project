@@ -35,6 +35,7 @@ const Navbar = () => {
 
     const role = `Role: ${user.role}`;
 
+
     return (
         <FlexBetween padding="1rem 6%" backgroundColor={alt}>
             <FlexBetween gap="1.75rem">

@@ -15,7 +15,6 @@ import { setLogin } from "../../state/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const registerSchema = yup.object().shape({
     firstName: yup
         .string()
@@ -67,7 +66,6 @@ const Form = () => {
     const isLogin = pageType === "login";
     const isRegister = pageType === "register";
 
-
     const register = async (values, onSubmitProps) => {
         const registerResponse = await fetch(
             "http://localhost:8001/auth/register",
@@ -108,11 +106,13 @@ const Form = () => {
         const loggedIn = await loggedInResponse.json();
         onSubmitProps.resetForm();
 
-        // if it cointanis user dispatch stuff else throw error fix
         if (loggedIn.error) {
             toast.error("Error, there was a mistake!");
-        } else if (loggedIn.user) {
+        } else if (loggedIn.user && loggedIn.token) {
             const { user, token } = loggedIn;
+
+            localStorage.setItem("accessToken", token);
+
             dispatch(
                 setLogin({
                     user: loggedIn.user,
