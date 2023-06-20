@@ -24,7 +24,7 @@ export const verifyToken = async (req, res, next) => {
 
 export const authRole = (requiredRoles) => {
     return (req, res, next) => {
-        const { role } = req.user;
+        const { role } = req.body.user;
 
         if (requiredRoles.includes(role)) {
             next();
@@ -35,5 +35,3 @@ export const authRole = (requiredRoles) => {
         }
     };
 };
-
-

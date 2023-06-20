@@ -79,6 +79,7 @@ export const updateStation = async (req, res) => {
 };
 
 export const deleteStation = async (req, res) => {
+    
     try {
         const { id } = req.params;
 

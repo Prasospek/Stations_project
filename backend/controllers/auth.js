@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { authRole } from "../middleware/auth.js";
 
 // Validate email, firstName, lastName, password
 const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
@@ -9,6 +10,7 @@ const secureRegex = /^[a-zA-Z0-9$./]+$/;
 /* REGISTER USER */
 export const register = async (req, res) => {
     try {
+        authRole
         const { firstName, lastName, email, password } = req.body;
 
         const salt = await bcrypt.genSalt(10);

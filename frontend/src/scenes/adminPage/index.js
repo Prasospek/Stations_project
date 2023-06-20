@@ -14,7 +14,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import * as yup from "yup";
 
-
 const registerSchema = yup.object().shape({
     firstName: yup
         .string()
@@ -41,7 +40,6 @@ const AdminPage = () => {
     const [users, setUsers] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [editedUser, setEditedUser] = useState({});
-
 
     const [totalTickets, setTotalTickets] = useState(0);
 
@@ -109,7 +107,7 @@ const AdminPage = () => {
                 // If validation passes, proceed with saving changes
                 await axios.put(
                     `http://localhost:8001/users/${editedUser._id}`,
-                    editedUser
+                    { editedUser, user: { role: "admin" } }
                 );
                 // Update the user in the users state
                 setUsers((prevUsers) =>
