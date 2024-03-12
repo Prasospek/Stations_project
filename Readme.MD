@@ -1,5 +1,7 @@
 <h1> Simulace dopravy na Marsu </h1>
 
+<b> Aplikace dostupná na adrese : https://stations-gyiz.onrender.com/ </b>
+
 <ul>
 <li>Systém obsahuje více stanic na povrchu a v podzemí planety. ✅</li>
 <li>Cestující si mohou zakoupit jízdenky na stanici přes pracovníka nebo sami online. ✅</li>
